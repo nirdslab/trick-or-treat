@@ -19,11 +19,11 @@
   "homepage": "https://github.com/nirdslab/facemesh-gaze-tracking#readme",
   "dependencies": {
     "@tensorflow-models/facemesh": "0.0.4",
-    "@tensorflow/tfjs-backend-cpu": "^2.1.0",
-    "@tensorflow/tfjs-backend-webgl": "^2.1.0",
-    "@tensorflow/tfjs-converter": "^2.1.0",
-    "@tensorflow/tfjs-core": "^2.1.0",
-    "stats.js": "^0.17.0"
+    "@tensorflow/tfjs-backend-cpu": "~2.1.0",
+    "@tensorflow/tfjs-backend-webgl": "~2.1.0",
+    "@tensorflow/tfjs-converter": "~2.1.0",
+    "@tensorflow/tfjs-core": "~2.1.0",
+    "stats.js": "~0.17.0"
   },
   "devDependencies": {
     "parcel-bundler": "^1.12.4"

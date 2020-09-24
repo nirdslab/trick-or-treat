@@ -2,6 +2,7 @@ import * as facemesh from '@tensorflow-models/facemesh';
 import Stats from 'stats.js';
 import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-backend-webgl';
+import 'regenerator-runtime/runtime'
 
 function isMobile() {
   const isAndroid = /Android/i.test(navigator.userAgent);
