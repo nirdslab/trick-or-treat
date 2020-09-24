@@ -4,8 +4,8 @@
   "description": "Gaze Tracking on Web Browser using Facemesh",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build index.html",
-    "start": "parcel index.html"
+    "build": "NODE_ENV=production parcel build index.html --target browser",
+    "start": "NODE_ENV=development parcel index.html --target browser --no-hmr"
   },
   "repository": {
     "type": "git",
