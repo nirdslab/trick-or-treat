@@ -1,0 +1,24 @@
+{
+  "name": "facemesh-gaze-tracking",
+  "version": "1.0.0",
+  "description": "Gaze Tracking on Web Browser using Facemesh",
+  "main": "index.js",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nirdslab/facemesh-gaze-tracking.git"
+  },
+  "author": "NIRDS Lab",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nirdslab/facemesh-gaze-tracking/issues"
+  },
+  "homepage": "https://github.com/nirdslab/facemesh-gaze-tracking#readme",
+  "dependencies": {
+    "@tensorflow-models/facemesh": "0.0.4",
+    "@tensorflow/tfjs-converter": "^2.4.0",
+    "@tensorflow/tfjs-core": "^2.4.0"
+  }
+}
