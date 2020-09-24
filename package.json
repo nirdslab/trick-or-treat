@@ -4,7 +4,8 @@
   "description": "Gaze Tracking on Web Browser using Facemesh",
   "main": "index.js",
   "scripts": {
-    "test": ""
+    "build": "parcel build index.html",
+    "start": "parcel index.html"
   },
   "repository": {
     "type": "git",
@@ -23,5 +24,8 @@
     "@tensorflow/tfjs-converter": "^2.4.0",
     "@tensorflow/tfjs-core": "^2.4.0",
     "stats.js": "^0.17.0"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4"
   }
 }
