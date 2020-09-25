@@ -47,7 +47,7 @@ function setupDatGui() {
 
 	if (mobile === false) {
 		gui.add(state, 'renderPointcloud').onChange(render => {
-			document.querySelector('#scatter-gl-container').setAttribute('display', render ? 'inline-block' : 'none');
+			document.querySelector('#scatter-gl-container').setAttribute('style', `display: ${render ? 'inline-block' : 'none'}`);
 		});
 	}
 }
@@ -185,8 +185,7 @@ async function main() {
 	canvas.width = videoWidth;
 	canvas.height = videoHeight;
 	const canvasContainer = document.querySelector('.canvas-wrapper');
-	canvasContainer.setAttribute('width', `${videoWidth}px`);
-	canvasContainer.setAttribute('height', `${videoHeight}px`);
+	canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
 
 	ctx = canvas.getContext('2d');
 	ctx.translate(canvas.width, 0);
@@ -200,8 +199,7 @@ async function main() {
 
 	if (mobile === false) {
 		const scatterGlContainer = <HTMLElement>document.querySelector('#scatter-gl-container');
-		scatterGlContainer.setAttribute('width', `${VIDEO_SIZE}px`);
-		scatterGlContainer.setAttribute('height', `${VIDEO_SIZE}px`);
+		scatterGlContainer.setAttribute('style', `width: ${VIDEO_SIZE}px; height: ${VIDEO_SIZE}px;`);
 		scatterGL = new ScatterGL(scatterGlContainer, { 'rotateOnStart': false, 'selectEnabled': false });
 	}
 };
