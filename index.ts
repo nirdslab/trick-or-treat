@@ -1,7 +1,7 @@
 import * as facemesh from './facemesh/facemesh';
 import * as dat from 'dat.gui';
 import Stats from 'stats.js';
-import * as tf from '@tensorflow/tfjs-core';
+import * as tf from '@tensorflow/tfjs';
 import * as facegaze from './facegaze';
 import 'regenerator-runtime/runtime';
 import { Renderer } from "./renderer";
@@ -13,7 +13,6 @@ function isMobile() {
 	return isAndroid || isiOS;
 }
 
-let renderer: Renderer;
 let datasetController: DatasetController;
 let requestId: number;
 let model: facemesh.FaceMesh;
@@ -22,6 +21,7 @@ let videoWidth: number;
 let videoHeight: number;
 let video: HTMLVideoElement;
 let canvas: HTMLCanvasElement;
+let renderer: Renderer;
 
 const VIDEO_SIZE = 500;
 const mobile = isMobile();
@@ -51,8 +51,8 @@ function setupDatGui() {
 	});
 }
 
-async function setupCamera() {
-	video = <HTMLVideoElement>document.getElementById('video');
+async function setupCamera(): Promise<HTMLVideoElement> {
+	let video = <HTMLVideoElement>document.getElementById('video');
 
 	const stream = await navigator.mediaDevices.getUserMedia({
 		'audio': false,
@@ -73,41 +73,51 @@ async function setupCamera() {
 	});
 }
 
-async function predictRender() {
+async function setupCanvas() {
+	canvas = <HTMLCanvasElement>document.getElementById('output');
+	renderer = new Renderer(video, canvas)
+}
+
+async function setupStats() {
+	stats.showPanel(0);  // 0: fps, 1: ms, 2: mb, 3+: custom
+	document.getElementById('main').appendChild(stats.dom);
+}
+
+async function setupModels() {
+	model = await facemesh.load({ maxFaces: state.maxFaces });
+	gazeModel = new facegaze.FaceGaze();
+}
+
+async function startPredictionLoop() {
 	stats.begin();
 
 	const returnTensors = false;
 	const flipHorizontal = false;
 
 	const predictions = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
+	if (predictions.length > 0) {
+		const gazePredictions = gazeModel.estimateGaze(predictions.map(p => p.scaledMesh));
+		console.log(gazePredictions);
+	}
 
 	renderer.renderPrediction(predictions);
 
 	stats.end();
-	requestId = requestAnimationFrame(predictRender);
+	requestId = requestAnimationFrame(startPredictionLoop);
 }
 
 async function main() {
 	await tf.setBackend(state.backend);
 	setupDatGui();
-
-	stats.showPanel(0);  // 0: fps, 1: ms, 2: mb, 3+: custom
-	document.getElementById('main').appendChild(stats.dom);
-
-	await setupCamera();
+	setupStats();
+	await setupModels();
+	video = await setupCamera();
+	await setupCanvas();
 	video.play();
-
-	canvas = <HTMLCanvasElement>document.getElementById('output');
-
-	renderer = new Renderer(video, canvas)
-
-	datasetController = new DatasetController();
-
 	start(state.mode);
-
 }
 
-async function start(mode: string) {
+async function start(mode: string = state.mode) {
 
 	if (requestId) {
 		cancelAnimationFrame(requestId);
@@ -115,12 +125,8 @@ async function start(mode: string) {
 
 	if (mode == 'predict') {
 		const canvasContainer = document.querySelector('.canvas-wrapper');
-
 		canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
-
-		model = await facemesh.load({ maxFaces: state.maxFaces });
-
-		predictRender();
+		startPredictionLoop();
 	}
 	else {
 		console.log('training');
