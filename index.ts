@@ -1,7 +1,7 @@
 import * as facemesh from './facemesh/facemesh';
 import * as dat from 'dat.gui';
 import Stats from 'stats.js';
-import * as tf from '@tensorflow/tfjs-core';
+import * as tf from '@tensorflow/tfjs';
 import * as facegaze from './facegaze';
 import 'regenerator-runtime/runtime';
 import { Renderer } from "./renderer";
@@ -37,8 +37,6 @@ const state = {
 
 function setupDatGui() {
 	const gui = new dat.GUI();
-	gui.add(state, 'backend', ['webgl', 'cpu'])
-		.onChange(async backend => await tf.setBackend(backend));
 
 	gui.add(state, 'maxFaces', 1, 20, 1).onChange(async val => model = await facemesh.load({ maxFaces: val }));
 	gui.add(state, 'predictIrises');
@@ -114,6 +112,10 @@ async function start(mode: string) {
 	}
 
 	if (mode == 'predict') {
+
+		document.getElementById("training").style.display = "none";
+		document.getElementById("prediction").style.display = "block";
+
 		const canvasContainer = document.querySelector('.canvas-wrapper');
 
 		canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
@@ -124,6 +126,9 @@ async function start(mode: string) {
 	}
 	else {
 		console.log('training');
+
+		document.getElementById("training").style.display = "block";
+		document.getElementById("prediction").style.display = "none";
 	}
 
 }
