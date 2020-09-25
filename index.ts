@@ -17,6 +17,8 @@ let renderer: Renderer;
 
 let datasetController: DatasetController;
 
+let requestId: number;
+
 let model: facemesh.FaceMesh;
 let videoWidth: number;
 let videoHeight: number;
@@ -52,9 +54,10 @@ function setupDatGui() {
 	}
 
 	gui.add(state, 'mode', ['predict', 'train']).onChange(mode => {
-		if(mode == 'train'){
-			datasetController.addTrainingSample(tf.tensor2d([[1, 2, 3]]), tf.tensor1d([4, 5]));
-		}
+		start(mode);
+		// if(mode == 'train'){
+		// 	datasetController.addTrainingSample(tf.tensor2d([[1, 2, 3]]), tf.tensor1d([4, 5]));
+		// }
 	});
 
 }
@@ -92,7 +95,7 @@ async function predictRender() {
 	renderer.renderPrediction(predictions);
 
 	stats.end();
-	requestAnimationFrame(predictRender);
+	requestId = requestAnimationFrame(predictRender);
 }
 
 async function main() {
@@ -111,19 +114,30 @@ async function main() {
 
 	datasetController =  new DatasetController();
 
-	const canvasContainer = document.querySelector('.canvas-wrapper');
+	start(state.mode);
 
-	canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
-
-	model = await facemesh.load({ maxFaces: state.maxFaces });
-
-	predictRender();
-
-	// if (mobile === false) {
-	// 	const scatterGlContainer = <HTMLElement>document.querySelector('#scatter-gl-container');
-	// 	scatterGlContainer.setAttribute('style', `width: ${VIDEO_SIZE}px; height: ${VIDEO_SIZE}px;`);
-	// 	scatterGL = new ScatterGL(scatterGlContainer, { 'rotateOnStart': false, 'selectEnabled': false });
-	// }
 }
 
+async function start(mode: string){
+
+	if(requestId){
+		cancelAnimationFrame(requestId);
+	}
+
+
+	if(mode == 'predict'){
+		const canvasContainer = document.querySelector('.canvas-wrapper');
+
+		canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
+
+		model = await facemesh.load({ maxFaces: state.maxFaces });
+
+		predictRender();
+	}
+	else{
+		console.log('training');
+
+	}
+
+}
 main();
