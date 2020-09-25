@@ -2,24 +2,22 @@ import * as facemesh from './facemesh/facemesh';
 import * as dat from 'dat.gui';
 import Stats from 'stats.js';
 import * as tf from '@tensorflow/tfjs-core';
-import '@tensorflow/tfjs-backend-webgl';
-import '@tensorflow/tfjs-backend-cpu';
+import * as facegaze from './facegaze';
 import 'regenerator-runtime/runtime';
-import {Renderer} from "./renderer";
-import {DatasetController} from "./dataset-controller";
+import { Renderer } from "./renderer";
+import { DatasetController } from "./dataset-controller";
 
 function isMobile() {
 	const isAndroid = /Android/i.test(navigator.userAgent);
 	const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 	return isAndroid || isiOS;
 }
+
 let renderer: Renderer;
-
 let datasetController: DatasetController;
-
 let requestId: number;
-
 let model: facemesh.FaceMesh;
+let gazeModel: facegaze.FaceGaze;
 let videoWidth: number;
 let videoHeight: number;
 let video: HTMLVideoElement;
@@ -42,7 +40,7 @@ function setupDatGui() {
 	gui.add(state, 'backend', ['webgl', 'cpu'])
 		.onChange(async backend => await tf.setBackend(backend));
 
-	gui.add(state, 'maxFaces', 1, 20, 1).onChange(async val => model = await facemesh.load({maxFaces: val}));
+	gui.add(state, 'maxFaces', 1, 20, 1).onChange(async val => model = await facemesh.load({ maxFaces: val }));
 	gui.add(state, 'predictIrises');
 
 	gui.add(state, 'mode', ['predict', 'train']).onChange(mode => {
@@ -51,7 +49,6 @@ function setupDatGui() {
 		// 	datasetController.addTrainingSample(tf.tensor2d([[1, 2, 3]]), tf.tensor1d([4, 5]));
 		// }
 	});
-
 }
 
 async function setupCamera() {
@@ -104,20 +101,19 @@ async function main() {
 
 	renderer = new Renderer(video, canvas)
 
-	datasetController =  new DatasetController();
+	datasetController = new DatasetController();
 
 	start(state.mode);
 
 }
 
-async function start(mode: string){
+async function start(mode: string) {
 
-	if(requestId){
+	if (requestId) {
 		cancelAnimationFrame(requestId);
 	}
 
-
-	if(mode == 'predict'){
+	if (mode == 'predict') {
 		const canvasContainer = document.querySelector('.canvas-wrapper');
 
 		canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
@@ -126,9 +122,8 @@ async function start(mode: string){
 
 		predictRender();
 	}
-	else{
+	else {
 		console.log('training');
-
 	}
 
 }

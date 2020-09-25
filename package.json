@@ -19,10 +19,7 @@
   "homepage": "https://github.com/nirdslab/facemesh-gaze-tracking#readme",
   "dependencies": {
     "@tensorflow-models/blazeface": "0.0.5",
-    "@tensorflow/tfjs-backend-cpu": "~2.4.0",
-    "@tensorflow/tfjs-backend-webgl": "~2.4.0",
-    "@tensorflow/tfjs-converter": "~2.4.0",
-    "@tensorflow/tfjs-core": "~2.4.0",
+    "@tensorflow/tfjs": "^2.4.0",
     "dat.gui": "^0.7.7",
     "scatter-gl": "0.0.7",
     "stats.js": "~0.17.0",
