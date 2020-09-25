@@ -17,6 +17,13 @@ export class Renderer{
     constructor(video:HTMLVideoElement, canvas: HTMLCanvasElement) {
         this.video = video;
         this.canvas = canvas;
+
+        this.video.width = this.video.videoWidth;
+        this.video.height =  this.video.videoHeight;
+
+        this.canvas.width = this.video.videoWidth;
+        this.canvas.height =  this.video.videoHeight;
+
         this.ctx = this.canvas.getContext('2d');
         this.initContext();
     }
