@@ -7,6 +7,7 @@ import 'regenerator-runtime/runtime';
 import { Renderer } from "./renderer";
 import { DatasetController } from "./dataset-controller";
 import {CalibrationRenderer} from "./calibration-renderer";
+import {FaceGaze} from "./facegaze";
 
 function isMobile() {
 	const isAndroid = /Android/i.test(navigator.userAgent);
@@ -35,7 +36,7 @@ const state = {
 	backend: 'webgl',
 	maxFaces: 1,
 	predictIrises: true,
-	mode: 'train'
+	mode: 'predict'
 };
 
 function setupDatGui() {
@@ -81,6 +82,10 @@ async function predictRender() {
 	const flipHorizontal = false;
 
 	const predictions = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
+	const predictionMeshes = predictions.map(p => p.scaledMesh);
+	const gazePoints = gazeModel.estimateGaze(predictionMeshes);
+
+	console.log(gazePoints);
 
 	renderer.renderPrediction(predictions);
 
@@ -98,12 +103,13 @@ async function calibrateRender(){
 	const predictions = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
 
 	if(calibrationRenderer.getCurrent()){
+		const meshes = predictions.map(p => p.scaledMesh);
+		const current = calibrationRenderer.getCurrent();
+		requestId = requestAnimationFrame(calibrateRender);
 		requestId = requestAnimationFrame(calibrateRender);
 	}
 
 	stats.end();
-
-
 
 }
 
@@ -161,6 +167,8 @@ async function main() {
 	datasetController = new DatasetController();
 
 	model = await facemesh.load({ maxFaces: state.maxFaces });
+
+	gazeModel =  new FaceGaze();
 
 	start(state.mode);
 
