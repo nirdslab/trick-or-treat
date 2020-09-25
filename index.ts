@@ -72,6 +72,8 @@ async function setupCamera(): Promise<HTMLVideoElement> {
 }
 
 async function setupCanvas() {
+	const canvasContainer = document.querySelector('.canvas-wrapper');
+	canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
 	canvas = <HTMLCanvasElement>document.getElementById('output');
 	renderer = new Renderer(video, canvas)
 }
@@ -93,8 +95,9 @@ async function startPredictionLoop() {
 	const flipHorizontal = false;
 
 	const predictions = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
-	if (predictions.length > 0) {
-		const gazePredictions = gazeModel.estimateGaze(predictions.map(p => p.scaledMesh));
+	const predictionMeshes = predictions.map(p => p.scaledMesh);
+	if (predictionMeshes.length > 0) {
+		const gazePredictions = gazeModel.estimateGaze(predictionMeshes);
 		console.log(gazePredictions);
 	}
 
@@ -122,12 +125,11 @@ async function start(mode: string = state.mode) {
 	}
 
 	if (mode == 'predict') {
+		console.log('predicting');
 
 		document.getElementById("training").style.display = "none";
 		document.getElementById("prediction").style.display = "block";
 
-		const canvasContainer = document.querySelector('.canvas-wrapper');
-		canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
 		startPredictionLoop();
 	}
 	else {
