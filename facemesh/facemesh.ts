@@ -7,10 +7,8 @@ import { Pipeline, Prediction } from './pipeline';
 import { Coord2D, Coords3D } from './util';
 import { UV_COORDS } from './uv_coords';
 
-const FACEMESH_GRAPHMODEL_PATH =
-  'https://tfhub.dev/mediapipe/tfjs-model/facemesh/1/default/1';
-const IRIS_GRAPHMODEL_PATH =
-  'https://tfhub.dev/mediapipe/tfjs-model/iris/1/default/2';
+const FACEMESH_GRAPHMODEL_PATH = 'https://tfhub.dev/mediapipe/tfjs-model/facemesh/1/default/1';
+const IRIS_GRAPHMODEL_PATH = 'https://tfhub.dev/mediapipe/tfjs-model/iris/1/default/2';
 const MESH_MODEL_INPUT_WIDTH = 192;
 const MESH_MODEL_INPUT_HEIGHT = 192;
 
@@ -224,17 +222,16 @@ export class FaceMesh {
       return (input as tf.Tensor).toFloat().expandDims(0);
     });
 
-    let predictions;
+    let predictions: Prediction[];
     if (tf.getBackend() === 'webgl') {
       // Currently tfjs-core does not pack depthwiseConv because it fails for
       // very large inputs (https://github.com/tensorflow/tfjs/issues/1652).
       // TODO(annxingyuan): call tf.enablePackedDepthwiseConv when available
       // (https://github.com/tensorflow/tfjs/issues/2821)
-      const savedWebglPackDepthwiseConvFlag =
-        tf.env().get('WEBGL_PACK_DEPTHWISECONV');
-      tf.env().set('WEBGL_PACK_DEPTHWISECONV', true);
+      const savedWebglPack = tf.env().get('WEBGL_PACK');
+      tf.env().set('WEBGL_PACK', true);
       predictions = await this.pipeline.predict(image, predictIrises);
-      tf.env().set('WEBGL_PACK_DEPTHWISECONV', savedWebglPackDepthwiseConvFlag);
+      tf.env().set('WEBGL_PACK', savedWebglPack);
     } else {
       predictions = await this.pipeline.predict(image, predictIrises);
     }
@@ -290,9 +287,7 @@ export class FaceMesh {
         };
 
         if (flipHorizontal) {
-          annotatedPrediction =
-            flipFaceHorizontal(annotatedPrediction, width) as
-            AnnotatedPredictionValues;
+          annotatedPrediction = flipFaceHorizontal(annotatedPrediction, width) as AnnotatedPredictionValues;
         }
 
         const annotations: { [key: string]: Coords3D } = {};

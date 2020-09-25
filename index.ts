@@ -19,7 +19,14 @@ function isMobile() {
 	return isAndroid || isiOS;
 }
 
-let model, ctx, videoWidth, videoHeight, video, canvas, scatterGLHasInitialized = false, scatterGL;
+let model: facemesh.FaceMesh;
+let ctx: CanvasRenderingContext2D;
+let videoWidth: number;
+let videoHeight: number;
+let video: HTMLVideoElement;
+let canvas: HTMLCanvasElement;
+let scatterGLHasInitialized = false;
+let scatterGL: ScatterGL;
 
 const VIDEO_SIZE = 500;
 const mobile = isMobile();
@@ -57,7 +64,7 @@ function distance(a, b) {
 }
 
 async function setupCamera() {
-	video = document.getElementById('video');
+	video = <HTMLVideoElement>document.getElementById('video');
 
 	const stream = await navigator.mediaDevices.getUserMedia({
 		'audio': false,
@@ -84,13 +91,12 @@ async function renderPrediction() {
 	const returnTensors = false;
 	const flipHorizontal = false;
 	const predictions = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
-	ctx.drawImage(
-		video, 0, 0, videoWidth, videoHeight, 0, 0, canvas.width, canvas.height);
+	ctx.drawImage(video, 0, 0, videoWidth, videoHeight, 0, 0, canvas.width, canvas.height);
 
 	if (predictions.length > 0) {
 		predictions.forEach(prediction => {
 
-			const keypoints = prediction.scaledMesh;
+			let keypoints = <number[]><unknown>(prediction.scaledMesh);
 
 			ctx.fillStyle = GREEN;
 			for (let i = 0; i < NUM_KEYPOINTS; i++) {
@@ -138,7 +144,7 @@ async function renderPrediction() {
 
 		if (mobile === false && state.renderPointcloud && scatterGL != null) {
 			const pointsData = predictions.map(prediction => {
-				let scaledMesh = prediction.scaledMesh;
+				let scaledMesh = <number[]><unknown>(prediction.scaledMesh);
 				return scaledMesh.map(point => ([-point[0], -point[1], -point[2]]));
 			});
 
@@ -181,7 +187,7 @@ async function main() {
 	video.width = videoWidth;
 	video.height = videoHeight;
 
-	canvas = document.getElementById('output');
+	canvas = <HTMLCanvasElement>document.getElementById('output');
 	canvas.width = videoWidth;
 	canvas.height = videoHeight;
 	const canvasContainer = document.querySelector('.canvas-wrapper');
