@@ -32,7 +32,6 @@ const state = {
 	backend: 'webgl',
 	maxFaces: 1,
 	predictIrises: true,
-	renderPointcloud: false,
 	mode: 'predict'
 };
 
@@ -42,14 +41,7 @@ function setupDatGui() {
 		.onChange(async backend => await tf.setBackend(backend));
 
 	gui.add(state, 'maxFaces', 1, 20, 1).onChange(async val => model = await facemesh.load({maxFaces: val}));
-
 	gui.add(state, 'predictIrises');
-
-	if (mobile === false) {
-		gui.add(state, 'renderPointcloud').onChange(render => {
-			document.querySelector('#scatter-gl-container').setAttribute('style', `display: ${render ? 'inline-block' : 'none'}`);
-		});
-	}
 
 	gui.add(state, 'mode', ['predict', 'train']).onChange(mode => {
 		if(mode == 'train'){
