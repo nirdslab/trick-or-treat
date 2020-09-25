@@ -6,6 +6,7 @@ import * as facegaze from './facegaze';
 import 'regenerator-runtime/runtime';
 import { Renderer } from "./renderer";
 import { DatasetController } from "./dataset-controller";
+import {CalibrationRenderer} from "./calibration-renderer";
 
 function isMobile() {
 	const isAndroid = /Android/i.test(navigator.userAgent);
@@ -14,6 +15,7 @@ function isMobile() {
 }
 
 let renderer: Renderer;
+let calibrationRenderer: CalibrationRenderer;
 let datasetController: DatasetController;
 let requestId: number;
 let model: facemesh.FaceMesh;
@@ -22,6 +24,7 @@ let videoWidth: number;
 let videoHeight: number;
 let video: HTMLVideoElement;
 let canvas: HTMLCanvasElement;
+let calibrationCanvas: HTMLCanvasElement;
 
 const VIDEO_SIZE = 500;
 const mobile = isMobile();
@@ -32,7 +35,7 @@ const state = {
 	backend: 'webgl',
 	maxFaces: 1,
 	predictIrises: true,
-	mode: 'predict'
+	mode: 'train'
 };
 
 function setupDatGui() {
@@ -85,6 +88,58 @@ async function predictRender() {
 	requestId = requestAnimationFrame(predictRender);
 }
 
+async function calibrateRender(){
+
+	stats.begin();
+
+	const returnTensors = false;
+	const flipHorizontal = false;
+
+	const predictions = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
+
+	if(calibrationRenderer.getCurrent()){
+		requestId = requestAnimationFrame(calibrateRender);
+	}
+
+	stats.end();
+
+
+
+}
+
+
+async function start(mode: string) {
+
+	if (requestId) {
+		cancelAnimationFrame(requestId);
+
+		console.log("cancelling request id "+ requestId);
+	}
+
+	if (mode == 'predict') {
+
+		document.getElementById("training").style.display = "none";
+		document.getElementById("prediction").style.display = "block";
+
+		const canvasContainer = document.querySelector('.canvas-wrapper');
+
+		canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
+
+		await predictRender();
+	}
+	else {
+		console.log('training');
+
+		calibrationRenderer.startRender();
+
+		await calibrateRender();
+
+		document.getElementById("training").style.display = "block";
+		document.getElementById("prediction").style.display = "none";
+	}
+
+}
+
 async function main() {
 	await tf.setBackend(state.backend);
 	setupDatGui();
@@ -97,39 +152,18 @@ async function main() {
 
 	canvas = <HTMLCanvasElement>document.getElementById('output');
 
+	calibrationCanvas = <HTMLCanvasElement>document.getElementById("calibration-canvas")
+
 	renderer = new Renderer(video, canvas)
 
+	calibrationRenderer = new CalibrationRenderer(calibrationCanvas);
+
 	datasetController = new DatasetController();
+
+	model = await facemesh.load({ maxFaces: state.maxFaces });
 
 	start(state.mode);
 
 }
 
-async function start(mode: string) {
-
-	if (requestId) {
-		cancelAnimationFrame(requestId);
-	}
-
-	if (mode == 'predict') {
-
-		document.getElementById("training").style.display = "none";
-		document.getElementById("prediction").style.display = "block";
-
-		const canvasContainer = document.querySelector('.canvas-wrapper');
-
-		canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
-
-		model = await facemesh.load({ maxFaces: state.maxFaces });
-
-		predictRender();
-	}
-	else {
-		console.log('training');
-
-		document.getElementById("training").style.display = "block";
-		document.getElementById("prediction").style.display = "none";
-	}
-
-}
 main();
