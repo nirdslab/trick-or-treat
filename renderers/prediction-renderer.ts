@@ -94,8 +94,6 @@ export class PredictionRenderer {
   }
 
   private initContext(): void {
-    this.faceCtx.translate(this.faceCanvas.width, 0);
-    this.faceCtx.scale(-1, 1);
     this.faceCtx.fillStyle = '#32EEDB';
     this.faceCtx.strokeStyle = '#32EEDB';
     this.faceCtx.lineWidth = 0.5;
@@ -110,18 +108,21 @@ export class PredictionRenderer {
     this.gazeCtx.closePath();
   }
 
+  private drawMeshPoint(x: number, y: number) {
+
+  }
+
   public async startRender(stats: Stats, models: [FaceMesh, FaceGaze], video: HTMLVideoElement, state: any) {
     this.running = true;
     const render = async () => {
       if (this.running) {
         stats.begin();
         const frame = tf.browser.fromPixels(video);
-        const predictions = await models[0].estimateFaces(frame, false, false, state.predictIrises);
+        const predictions = await models[0].estimateFaces(frame, false, false, true);
         if (predictions.length) {
           const predictionMeshes = predictions.map(p => (p.scaledMesh as Coords3D));
           const gazePoints = models[1].estimateGaze(predictionMeshes);
           const [x, y] = [gazePoints[0] * this.gazeCanvas.width, gazePoints[1] * this.gazeCanvas.height];
-          console.log(x, y)
           this.drawGazePoint(x, y);
         }
         this.renderPrediction(frame, predictions);

@@ -12,8 +12,8 @@ export class Main {
   // HTML Elements
   private mainElement: HTMLElement;
   private video: HTMLVideoElement;
-  private canvas: HTMLCanvasElement;
-  private calibrationCanvas: HTMLCanvasElement;
+  private faceCanvas: HTMLCanvasElement;
+  private gazeCanvas: HTMLCanvasElement;
   // Renderers
   private predictionRenderer: PredictionRenderer;
   private calibrationRenderer: CalibrationRenderer;
@@ -22,46 +22,45 @@ export class Main {
   private stats = new Stats();
   private gui = new GUI();
   // Application State
-  private state = { backend: 'webgl', maxFaces: 1, predictIrises: true, mode: 'predict' };
+  private state = { maxFaces: 1, mode: 'predict' };
   // Models
   private model: facemesh.FaceMesh;
   private gazeModel: facegaze.FaceGaze;
-  private videoWidth = 224;
-  private videoHeight = 224;
+  private videoWidth = 512;
+  private videoHeight = 512;
 
   constructor() {
     // Common Components
     this.mainElement = document.getElementById('main');
     // Prediction Components
     this.video = <HTMLVideoElement>document.getElementById('video');
-    this.canvas = <HTMLCanvasElement>document.getElementById('output');
-    // Calibration Components
-    this.datasetController = new DatasetController();
-    this.calibrationCanvas = <HTMLCanvasElement>document.getElementById("calibration-canvas");
+    this.faceCanvas = <HTMLCanvasElement>document.getElementById('face-output');
+    // Gaze Components
+    this.gazeCanvas = <HTMLCanvasElement>document.getElementById("gaze-output");
     // Renderers
-    this.predictionRenderer = new PredictionRenderer(this.video, this.canvas, this.calibrationCanvas);
-    this.calibrationRenderer = new CalibrationRenderer(this.calibrationCanvas, this.datasetController);
+    this.datasetController = new DatasetController();
+    this.predictionRenderer = new PredictionRenderer(this.video, this.faceCanvas, this.gazeCanvas);
+    this.calibrationRenderer = new CalibrationRenderer(this.gazeCanvas, this.datasetController);
   }
 
   private async start(mode: string) {
     if (mode == 'predict') {
       console.log("predicting");
-      // document.getElementById("training").style.display = "none";
-      document.getElementById("prediction").style.display = "block";
       this.calibrationRenderer.stopCalibration();
       this.calibrationRenderer.stopRender();
       await this.predictionRenderer.startRender(this.stats, [this.model, this.gazeModel], this.video, this.state);
     }
     else {
-      console.log('training');
-      // document.getElementById("training").style.display = "block";
-      document.getElementById("prediction").style.display = "none";
+      console.log('calibrating');
       this.predictionRenderer.stopRender();
       await this.calibrationRenderer.startRender(this.stats, this.model, this.video, this.state);
-      this.calibrationRenderer.startCalibration(() => {
-        console.log("Training");
+      this.calibrationRenderer.startCalibration(async () => {
+        console.log("training");
         const trainingData = this.datasetController.getTrainingTensors();
-        this.gazeModel.fit(trainingData[0], trainingData[1]);
+        await this.gazeModel.fit(trainingData[0], trainingData[1]);
+        console.log("training completed");
+        this.state.mode = "predict";
+        this.start("predict");
       });
     }
   }
@@ -87,8 +86,8 @@ export class Main {
       this.video.onloadedmetadata = () => {
         this.video.width = this.videoWidth;
         this.video.height = this.videoHeight;
-        this.canvas.width = this.videoWidth;
-        this.canvas.height = this.videoHeight;
+        this.faceCanvas.width = this.videoWidth;
+        this.faceCanvas.height = this.videoHeight;
         resolve();
       };
     });
@@ -98,7 +97,6 @@ export class Main {
     this.gui.add(this.state, 'maxFaces', 1, 20, 1).onChange(async (val) => {
       this.model = await facemesh.load({ maxFaces: val })
     });
-    this.gui.add(this.state, 'predictIrises');
     this.gui.add(this.state, 'mode', ['predict', 'train']).onChange(mode => {
       this.start(mode);
     });
@@ -110,7 +108,7 @@ export class Main {
   }
 
   public async run() {
-    await tf.setBackend(this.state.backend);
+    await tf.setBackend("webgl");
     await this.setupDatGUI();
     await this.setupStatsGUI();
     await this.setupCamera();

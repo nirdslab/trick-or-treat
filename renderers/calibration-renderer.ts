@@ -1,5 +1,6 @@
 import { DatasetController } from "../dataset-controller";
 import { FaceMesh } from "../facemesh/facemesh";
+import { Coords3D } from "../facemesh/util";
 
 export class CalibrationRenderer {
 
@@ -10,34 +11,33 @@ export class CalibrationRenderer {
   private running = false;
 
   constructor(
-    private canvas: HTMLCanvasElement,
+    private gazeCanvas: HTMLCanvasElement,
     private datasetController: DatasetController
   ) {
-    this.canvas = canvas;
 
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
+    this.gazeCanvas.width = window.innerWidth;
+    this.gazeCanvas.height = window.innerHeight;
 
-    let xoffset = this.canvas.width * 0.1;
-    let yoffset = this.canvas.height * 0.1;
+    let xoffset = this.gazeCanvas.width * 0.1;
+    let yoffset = this.gazeCanvas.height * 0.1;
 
-    this.ctx = this.canvas.getContext('2d');
+    this.ctx = this.gazeCanvas.getContext('2d');
 
     this.calibPoints = [
       [xoffset, yoffset],
-      [this.canvas.width / 2, yoffset],
-      [this.canvas.width - xoffset, yoffset],
-      [xoffset, this.canvas.height / 2],
-      [this.canvas.width / 2, this.canvas.height / 2],
-      [this.canvas.width - xoffset, this.canvas.height / 2],
-      [xoffset, this.canvas.height - yoffset],
-      [this.canvas.width / 2, this.canvas.height - yoffset],
-      [this.canvas.width - xoffset, this.canvas.height - yoffset],
+      [this.gazeCanvas.width / 2, yoffset],
+      [this.gazeCanvas.width - xoffset, yoffset],
+      [xoffset, this.gazeCanvas.height / 2],
+      [this.gazeCanvas.width / 2, this.gazeCanvas.height / 2],
+      [this.gazeCanvas.width - xoffset, this.gazeCanvas.height / 2],
+      [xoffset, this.gazeCanvas.height - yoffset],
+      [this.gazeCanvas.width / 2, this.gazeCanvas.height - yoffset],
+      [this.gazeCanvas.width - xoffset, this.gazeCanvas.height - yoffset],
     ]
     console.log("Calibration Points - ", this.calibPoints.length);
   }
 
-  startCalibration(onComplete) {
+  startCalibration(onComplete: Function) {
     this.index = 0;
     // let calibPoint = this.calibPoints[this.index];
     // this.drawBall(calibPoint[0], calibPoint[1]);
@@ -61,7 +61,7 @@ export class CalibrationRenderer {
 
   drawBall(x: number, y: number) {
 
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.gazeCanvas.width, this.gazeCanvas.height);
     this.ctx.beginPath();
     this.ctx.arc(x, y, 10, 0, Math.PI * 2);
     this.ctx.fillStyle = "#0095DD";
@@ -97,9 +97,9 @@ export class CalibrationRenderer {
       let calibPoint = this.getCurrent();
       if (calibPoint) {
         const estimatedFaces = await model.estimateFaces(video, false, false, state.predictIrises);
-        const meshes = estimatedFaces.map(p => p.scaledMesh);
+        const meshes = estimatedFaces.map(p => p.scaledMesh) as Coords3D[];
         if (meshes.length > 0) {
-          this.datasetController.addTrainingSample(meshes[0], [calibPoint[0]/ this.canvas.width, calibPoint[1]/this.canvas.height]);
+          this.datasetController.addTrainingSample(meshes, [calibPoint[0]/ this.gazeCanvas.width, calibPoint[1]/this.gazeCanvas.height]);
         }
       }
       stats.end();

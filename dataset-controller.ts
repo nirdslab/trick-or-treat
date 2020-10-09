@@ -2,39 +2,22 @@ import * as tf from '@tensorflow/tfjs-core';
 
 export class DatasetController {
 
-  private xs: Array<Array<number>> = [];
-  private ys: Array<Array<number>> = [];
+  private xs: number[][][] = [];
+  private ys: number[][] = [];
 
   constructor() { }
 
-  addTrainingSample(facemesh: Array<number>, screenpoint: Array<number>) {
-
-    this.xs.push(facemesh);
-    this.ys.push(screenpoint)
-
-    //
-    // if (this.xs == null) {
-    //   this.xs = tf.keep(sample.expandDims(0))
-    //   this.ys = tf.keep(prediction.expandDims(0))
-    // }
-    // else {
-    //   const oldXs = this.xs;
-    //   const oldYs = this.ys;
-    //
-    //
-    //   this.xs = tf.keep(oldXs.concat(sample.expandDims(0), 0));
-    //   this.ys = tf.keep(oldYs.concat(prediction.expandDims(0), 0));
-    //
-    //   oldXs.dispose();
-    //   oldYs.dispose();
-    // }
-
+  addTrainingSample(meshes: number[][][], screenpoints: number[]) {
+    meshes.map(mesh => mesh.slice(468, mesh.length)).forEach(mesh => {
+      this.xs.push(mesh);
+      this.ys.push(screenpoints);
+    });
   }
 
-  getTrainingTensors(){
+  getTrainingTensors(): [tf.Tensor3D, tf.Tensor2D] {
     return [
-        tf.tensor(this.xs),
-        tf.tensor(this.ys)
+      tf.tensor3d(this.xs, [this.xs.length, 10, 3]),
+      tf.tensor2d(this.ys, [this.ys.length, 2]).add(tf.randomNormal([this.ys.length, 2], 0, 0.005))
     ];
   }
 }
