@@ -35,17 +35,18 @@ export class Main {
     // Prediction Components
     this.video = <HTMLVideoElement>document.getElementById('video');
     this.canvas = <HTMLCanvasElement>document.getElementById('output');
-    this.predictionRenderer = new PredictionRenderer(this.video, this.canvas);
     // Calibration Components
     this.datasetController = new DatasetController();
     this.calibrationCanvas = <HTMLCanvasElement>document.getElementById("calibration-canvas");
+    // Renderers
+    this.predictionRenderer = new PredictionRenderer(this.video, this.canvas, this.calibrationCanvas);
     this.calibrationRenderer = new CalibrationRenderer(this.calibrationCanvas, this.datasetController);
   }
 
   private async start(mode: string) {
     if (mode == 'predict') {
       console.log("predicting");
-      document.getElementById("training").style.display = "none";
+      // document.getElementById("training").style.display = "none";
       document.getElementById("prediction").style.display = "block";
       this.calibrationRenderer.stopCalibration();
       this.calibrationRenderer.stopRender();
@@ -53,7 +54,7 @@ export class Main {
     }
     else {
       console.log('training');
-      document.getElementById("training").style.display = "block";
+      // document.getElementById("training").style.display = "block";
       document.getElementById("prediction").style.display = "none";
       this.predictionRenderer.stopRender();
       await this.calibrationRenderer.startRender(this.stats, this.model, this.video, this.state);

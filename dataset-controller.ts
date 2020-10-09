@@ -1,4 +1,3 @@
-import { Tensor1D, Tensor2D } from "@tensorflow/tfjs-core";
 import * as tf from '@tensorflow/tfjs-core';
 
 export class DatasetController {

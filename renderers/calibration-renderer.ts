@@ -1,6 +1,5 @@
 import { DatasetController } from "../dataset-controller";
 import { FaceMesh } from "../facemesh/facemesh";
-import * as tf from '@tensorflow/tfjs';
 
 export class CalibrationRenderer {
 
@@ -100,7 +99,6 @@ export class CalibrationRenderer {
         const estimatedFaces = await model.estimateFaces(video, false, false, state.predictIrises);
         const meshes = estimatedFaces.map(p => p.scaledMesh);
         if (meshes.length > 0) {
-          console.log("Sample", meshes[0], [calibPoint[0]/ this.canvas.width, calibPoint[1]/this.canvas.height])
           this.datasetController.addTrainingSample(meshes[0], [calibPoint[0]/ this.canvas.width, calibPoint[1]/this.canvas.height]);
         }
       }
