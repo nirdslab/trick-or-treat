@@ -13,7 +13,10 @@ export class PredictionRenderer {
   private canvas: HTMLCanvasElement;
   private requestId: number;
 
-  constructor(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
+  constructor(
+    video: HTMLVideoElement,
+    canvas: HTMLCanvasElement
+  ) {
     this.video = video;
     this.canvas = canvas;
 

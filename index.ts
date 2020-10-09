@@ -41,7 +41,7 @@ export class Main {
     // Calibration Components
     this.datasetController = new DatasetController();
     this.calibrationCanvas = <HTMLCanvasElement>document.getElementById("calibration-canvas");
-    this.calibrationRenderer = new CalibrationRenderer(this.calibrationCanvas);
+    this.calibrationRenderer = new CalibrationRenderer(this.calibrationCanvas, this.datasetController);
   }
 
   private async start(mode: string) {

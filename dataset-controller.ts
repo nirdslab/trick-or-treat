@@ -11,15 +11,15 @@ export class DatasetController {
   addTrainingSample(sample: Tensor2D, prediction: Tensor1D) {
 
     if (this.xs == null) {
-      this.xs = tf.keep(sample)
-      this.ys = tf.keep(prediction)
+      this.xs = tf.keep(sample.expandDims(0))
+      this.ys = tf.keep(prediction.expandDims(0))
     }
     else {
       const oldXs = this.xs;
       const oldYs = this.ys;
 
-      this.xs = tf.keep(oldXs.concat(sample, 0));
-      this.ys = tf.keep(oldYs.concat(prediction, 0));
+      this.xs = tf.keep(oldXs.concat(sample.expandDims(0), 0));
+      this.ys = tf.keep(oldYs.concat(prediction.expandDims(0), 0));
 
       oldXs.dispose();
       oldYs.dispose();

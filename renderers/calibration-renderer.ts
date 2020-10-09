@@ -1,15 +1,19 @@
+import { DatasetController } from "../dataset-controller";
 import { FaceMesh } from "../facemesh/facemesh";
+import * as tf from '@tensorflow/tfjs';
 
 export class CalibrationRenderer {
 
     private ctx: CanvasRenderingContext2D;
-    private canvas: HTMLCanvasElement;
     private calibPoints: Array<any>;
     private index: number = 0;
     private interval: NodeJS.Timeout;
     private requestId: number;
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(
+        private canvas: HTMLCanvasElement,
+        private datasetController: DatasetController
+    ) {
         this.canvas = canvas;
 
         this.canvas.width = window.innerWidth;
@@ -83,10 +87,12 @@ export class CalibrationRenderer {
 
     public async startRender(stats: Stats, model: FaceMesh, video: HTMLVideoElement, state: any) {
         stats.begin();
-        const predictions = await model.estimateFaces(video, false, false, state.predictIrises);
+        const estimatedFaces = await model.estimateFaces(video, false, false, state.predictIrises);
         if (this.getCurrent()) {
-            const meshes = predictions.map(p => p.scaledMesh);
-            const current = this.getCurrent();
+            const meshes = estimatedFaces.map(p => p.scaledMesh);
+            if (meshes.length > 0) {
+                this.datasetController.addTrainingSample(tf.tensor2d(<any>meshes[0]), tf.tensor1d(this.getCurrent()))
+            }
             this.requestId = requestAnimationFrame(() => this.startRender(stats, model, video, state));
         }
         stats.end();
