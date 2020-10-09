@@ -1,5 +1,7 @@
+import { TypeFlags } from "typescript";
 import { FaceGaze } from "../facegaze/facegaze";
 import { FaceMesh } from "../facemesh/facemesh";
+import * as tf from "@tensorflow/tfjs";
 
 const NUM_KEYPOINTS = 468;
 const NUM_IRIS_KEYPOINTS = 5;
@@ -30,10 +32,9 @@ export class PredictionRenderer {
     this.initContext();
   }
 
-  renderPrediction(predictions: any[]) {
+  async renderPrediction(frame: tf.Tensor3D, predictions: any[]) {
 
-    this.ctx.drawImage(
-      this.video, 0, 0, this.video.width, this.video.height, 0, 0, this.canvas.width, this.canvas.height);
+    await tf.browser.toPixels(frame, this.canvas);
 
     if (predictions.length > 0) {
       predictions.forEach(prediction => {
@@ -107,13 +108,14 @@ export class PredictionRenderer {
     const render = async () => {
       if (this.running) {
         stats.begin();
-        const predictions = await models[0].estimateFaces(video, false, false, state.predictIrises);
+        const frame = tf.browser.fromPixels(video);
+        const predictions = await models[0].estimateFaces(frame, false, false, state.predictIrises);
         if (predictions.length) {
           const predictionMeshes = predictions.map(p => p.scaledMesh);
           const gazePoints = models[1].estimateGaze(predictionMeshes);
           console.log(...gazePoints);
         }
-        this.renderPrediction(predictions);
+        this.renderPrediction(frame, predictions);
         stats.end();
         requestAnimationFrame(render);
       }
