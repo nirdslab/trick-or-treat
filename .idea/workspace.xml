@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5e7488a5-7e11-4e41-9942-53ab6198a546" name="Default Changelist" comment="Fixes to calibration process ending + fixes">
+      <change beforePath="$PROJECT_DIR$/dataset-controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/dataset-controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/index.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1hyS06zwtnU0szQn7IuNatmLdgq" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="start" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5e7488a5-7e11-4e41-9942-53ab6198a546" name="Default Changelist" comment="" />
+      <created>1600981613122</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1600981613122</updated>
+      <workItem from="1600981614421" duration="35455000" />
+      <workItem from="1601060953124" duration="9350000" />
+    </task>
+    <task id="LOCAL-00001" summary="Basic refactoring">
+      <created>1600998620295</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1600998620295</updated>
+    </task>
+    <task id="LOCAL-00002" summary="More refactoring">
+      <created>1601003674899</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1601003674899</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Added run modes">
+      <created>1601009784891</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1601009784891</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Added HTML manipulation">
+      <created>1601013122119</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1601013122119</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Added Calibration rendering">
+      <created>1601023680122</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1601023680122</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Merge with estimation model - Memory leak on WebGL">
+      <created>1601024795733</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1601024795733</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Minor fixes - Still memory leak??">
+      <created>1602205729891</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1602205729891</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Fixes to calibration process ending + fixes">
+      <created>1602208719401</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1602208719401</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Basic refactoring" />
+    <MESSAGE value="More refactoring" />
+    <MESSAGE value="Added run modes" />
+    <MESSAGE value="Added HTML manipulation" />
+    <MESSAGE value="Added Calibration rendering" />
+    <MESSAGE value="Merge with estimation model - Memory leak on WebGL" />
+    <MESSAGE value="Minor fixes - Still memory leak??" />
+    <MESSAGE value="Fixes to calibration process ending + fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixes to calibration process ending + fixes" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="4395" y="200" width="800" height="729" key="#Intentions" timestamp="1601021734054">
+      <screen x="3840" y="0" width="1920" height="1080" />
+    </state>
+    <state x="4395" y="200" width="800" height="729" key="#Intentions/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@3840.0.1920.1080" timestamp="1601021734054" />
+    <state x="2371" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1600984697735">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2371" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984697735" />
+    <state width="1830" height="278" key="GridCell.Tab.0.bottom" timestamp="1601005069713">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="278" key="GridCell.Tab.0.bottom/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1601005069713" />
+    <state width="1830" height="278" key="GridCell.Tab.0.center" timestamp="1601005069713">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="278" key="GridCell.Tab.0.center/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1601005069713" />
+    <state width="1830" height="278" key="GridCell.Tab.0.left" timestamp="1601005069713">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="278" key="GridCell.Tab.0.left/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1601005069713" />
+    <state width="1830" height="278" key="GridCell.Tab.0.right" timestamp="1601005069713">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="278" key="GridCell.Tab.0.right/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1601005069713" />
+    <state width="1830" height="437" key="GridCell.Tab.1.bottom" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.1.bottom/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.1.center" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.1.center/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.1.left" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.1.left/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.1.right" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.1.right/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.2.bottom" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.2.bottom/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.2.center" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.2.center/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.2.left" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.2.left/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.2.right" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.2.right/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.3.bottom" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.3.bottom/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.3.center" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.3.center/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.3.left" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.3.left/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state width="1830" height="437" key="GridCell.Tab.3.right" timestamp="1600984953055">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1830" height="437" key="GridCell.Tab.3.right/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984953055" />
+    <state x="4022" y="92" width="1536" height="894" key="MergeDialog" timestamp="1601023957310">
+      <screen x="3840" y="0" width="1920" height="1080" />
+    </state>
+    <state x="4022" y="92" width="1536" height="894" key="MergeDialog/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@3840.0.1920.1080" timestamp="1601023957310" />
+    <state x="4431" y="301" width="728" height="475" key="MultipleFileMergeDialog" timestamp="1601023960357">
+      <screen x="3840" y="0" width="1920" height="1080" />
+    </state>
+    <state x="4431" y="301" width="728" height="475" key="MultipleFileMergeDialog/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@3840.0.1920.1080" timestamp="1601023960357" />
+    <state x="2622" y="236" width="572" height="633" key="RollbackChangesDialog" timestamp="1601007643904">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2622" y="236" width="572" height="633" key="RollbackChangesDialog/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1601007643904" />
+    <state x="588" y="294" width="800" height="556" key="Vcs.Push.Dialog.v2" timestamp="1602208721097">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="588" y="294" width="800" height="556" key="Vcs.Push.Dialog.v2/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1602208721097" />
+    <state x="2508" y="274" width="800" height="556" key="Vcs.Push.Dialog.v2/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1601003677063" />
+    <state x="4428" y="274" width="800" height="556" key="Vcs.Push.Dialog.v2/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@3840.0.1920.1080" timestamp="1601024798280" />
+    <state x="2439" y="264" width="938" height="576" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1600984864953">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2439" y="264" width="938" height="576" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@1920.0.1920.1080" timestamp="1600984864953" />
+    <state x="651" y="128" width="618" height="849" key="find.popup" timestamp="1602208896354">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="651" y="128" width="618" height="849" key="find.popup/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1602208896354" />
+    <state x="4491" y="104" width="618" height="870" key="find.popup/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@3840.0.1920.1080" timestamp="1601014291382" />
+    <state x="623" y="237" width="672" height="678" key="search.everywhere.popup" timestamp="1602209074993">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="623" y="237" width="672" height="678" key="search.everywhere.popup/1920.0.1920.1080/3840.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1602209074993" />
+  </component>
+</project>

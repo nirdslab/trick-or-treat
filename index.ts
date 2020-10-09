@@ -104,13 +104,13 @@ async function calibrateRender(){
 	const returnTensors = false;
 	const flipHorizontal = false;
 
-	const predictions = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
+	const estimatedFaces = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
 
 	if(calibrationRenderer.getCurrent()){
-		const meshes = predictions.map(p => p.scaledMesh);
+		// const meshes = predictions.map(p => p.scaledMesh);
 		const current = calibrationRenderer.getCurrent();
+		datasetController.addTrainingSample(tf.tensor2d(estimatedFaces[0].scaledMesh), tf.tensor1d(calibrationRenderer.getCurrent()));
 		requestId = requestAnimationFrame(calibrateRender);
-		// requestId = requestAnimationFrame(calibrateRender);
 	}
 
 	stats.end();
