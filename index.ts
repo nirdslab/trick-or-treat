@@ -57,8 +57,9 @@ async function setupCamera() {
 	video = <HTMLVideoElement>document.getElementById('video');
 
 	const stream = await navigator.mediaDevices.getUserMedia({
-		'audio': false,
-		'video': {
+		audio: false,
+		video: {
+			deviceId: '463c9125011ecfedab1a2cf9b33046959ccc8ab3b1821a94c16f9151d8315ab5',
 			facingMode: 'user',
 			// Only setting the video to a specified size in order to accommodate a
 			// point cloud, so on mobile devices accept the default size.
