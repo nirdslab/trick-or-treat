@@ -26,8 +26,8 @@ export class Main {
   // Models
   private model: facemesh.FaceMesh;
   private gazeModel: facegaze.FaceGaze;
-  private videoWidth = 512;
-  private videoHeight = 512;
+  private videoWidth = 224;
+  private videoHeight = 224;
 
   constructor() {
     // Common Components
@@ -46,12 +46,23 @@ export class Main {
   private async start(mode: string) {
     if (mode == 'predict') {
       console.log("predicting");
+      // Update attributes
+      this.gui.show();
+      this.mainElement.appendChild(this.stats.dom);
+      this.gui.updateDisplay();
+      this.faceCanvas.hidden = false;
+      // Logic
       this.calibrationRenderer.stopCalibration();
       this.calibrationRenderer.stopRender();
       await this.predictionRenderer.startRender(this.stats, [this.model, this.gazeModel], this.video, this.state);
     }
     else {
       console.log('calibrating');
+      // Update attributes
+      this.gui.hide();
+      this.mainElement.removeChild(this.stats.dom);
+      this.faceCanvas.hidden = true;
+      // Logic
       this.predictionRenderer.stopRender();
       await this.calibrationRenderer.startRender(this.stats, this.model, this.video, this.state);
       this.calibrationRenderer.startCalibration(async () => {
@@ -100,11 +111,11 @@ export class Main {
     this.gui.add(this.state, 'mode', ['predict', 'train']).onChange(mode => {
       this.start(mode);
     });
+    this.gui.hide();
   }
 
   private async setupStatsGUI() {
     this.stats.showPanel(0);  // 0: fps, 1: ms, 2: mb, 3+: custom
-    this.mainElement.appendChild(this.stats.dom);
   }
 
   public async run() {
