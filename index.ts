@@ -13,7 +13,6 @@ export class Main {
   private mainElement: HTMLElement;
   private video: HTMLVideoElement;
   private canvas: HTMLCanvasElement;
-  private canvasContainer: HTMLElement;
   private calibrationCanvas: HTMLCanvasElement;
   // Renderers
   private predictionRenderer: PredictionRenderer;
@@ -32,7 +31,6 @@ export class Main {
 
   constructor() {
     // Common Components
-    this.canvasContainer = document.querySelector('.canvas-wrapper');
     this.mainElement = document.getElementById('main');
     // Prediction Components
     this.video = <HTMLVideoElement>document.getElementById('video');
@@ -49,7 +47,6 @@ export class Main {
       console.log("predicting");
       document.getElementById("training").style.display = "none";
       document.getElementById("prediction").style.display = "block";
-      this.canvasContainer.setAttribute('style', `width: ${this.videoWidth}px; height: ${this.videoHeight}px`);
       this.calibrationRenderer.stopCalibration();
       this.calibrationRenderer.stopRender();
       await this.predictionRenderer.startRender(this.stats, [this.model, this.gazeModel], this.video, this.state);
@@ -87,8 +84,7 @@ export class Main {
         this.video.height = this.videoHeight;
         this.canvas.width = this.videoWidth;
         this.canvas.height = this.videoHeight;
-        this.video.play();
-        resolve(this.video);
+        resolve();
       };
     });
   }
@@ -98,7 +94,6 @@ export class Main {
       this.model = await facemesh.load({ maxFaces: val })
     });
     this.gui.add(this.state, 'predictIrises');
-
     this.gui.add(this.state, 'mode', ['predict', 'train']).onChange(mode => {
       this.start(mode);
     });

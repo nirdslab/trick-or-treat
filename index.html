@@ -1,30 +1,17 @@
 <head>
 	<style>
-		.canvas-wrapper,
-		#scatter-gl-container {
-			display: inline-block;
-			vertical-align: top;
+		div#prediction {
+			width: auto;
+			height: auto;
 		}
 
-		#scatter-gl-container {
-			border: solid 1px black;
-			position: relative;
-		}
-
-		/* center the canvas within its wrapper */
-		#scatter-gl-container canvas {
-			transform: translate3d(-50%, -50%, 0);
-			left: 50%;
-			top: 50%;
-			position: absolute;
+		div#training {
+			width: 100%;
+			height: 100%;
 		}
 
 		video#video {
-			-webkit-transform: scaleX(-1);
-			transform: scaleX(-1);
-			visibility: hidden;
-			width: auto;
-			height: auto;
+			display: none;
 		}
 	</style>
 </head>
@@ -32,14 +19,11 @@
 <body>
 	<div id="main">
 		<div id="prediction">
-			<div class="canvas-wrapper">
-				<canvas id="output"></canvas>
-				<video id="video" playsinline></video>
-			</div>
-			<div id="scatter-gl-container"></div>
+			<canvas id="output"></canvas>
+			<video id="video" autoplay></video>
 		</div>
 
-		<div id="training" style="width:100%;height:100%;">
+		<div id="training">
 			<canvas id="calibration-canvas"></canvas>
 		</div>
 	</div>

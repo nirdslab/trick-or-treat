@@ -49,6 +49,7 @@ export class PredictionRenderer {
           const radius = 1;
           this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
           this.ctx.fill();
+          this.ctx.closePath();
         }
 
         if (keypoints.length > NUM_KEYPOINTS) {
@@ -66,6 +67,7 @@ export class PredictionRenderer {
           this.ctx.beginPath();
           this.ctx.ellipse(leftCenter[0], leftCenter[1], leftDiameterX / 2, leftDiameterY / 2, 0, 0, 2 * Math.PI);
           this.ctx.stroke();
+          this.ctx.closePath();
 
           if (keypoints.length > NUM_KEYPOINTS + NUM_IRIS_KEYPOINTS) {
             const rightCenter = keypoints[NUM_KEYPOINTS + NUM_IRIS_KEYPOINTS];
@@ -79,6 +81,7 @@ export class PredictionRenderer {
             this.ctx.beginPath();
             this.ctx.ellipse(rightCenter[0], rightCenter[1], rightDiameterX / 2, rightDiameterY / 2, 0, 0, 2 * Math.PI);
             this.ctx.stroke();
+            this.ctx.closePath();
           }
         }
 
