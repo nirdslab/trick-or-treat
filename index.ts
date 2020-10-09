@@ -127,6 +127,7 @@ async function start(mode: string) {
 	}
 
 	if (mode == 'predict') {
+		console.log("predicting");
 
 		document.getElementById("training").style.display = "none";
 		document.getElementById("prediction").style.display = "block";
@@ -134,7 +135,7 @@ async function start(mode: string) {
 		const canvasContainer = document.querySelector('.canvas-wrapper');
 
 		canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
-
+		calibrationRenderer.stopRender();
 		await predictRender();
 	}
 	else {

@@ -50,6 +50,12 @@ export class CalibrationRenderer {
 
     }
 
+    stopRender(){
+        clearInterval(this.interval);
+        this.index = 0;
+        console.log("Stopping calibration render - Interval cleared");
+    }
+
     drawBall(x, y){
 
         this.ctx.clearRect(0,0 , this.canvas.width, this.canvas.height);
@@ -69,7 +75,7 @@ export class CalibrationRenderer {
             c.index = c.index + 1;
         }
         else{
-            clearInterval(c.interval);
+            this.stopRender();
         }
 
     }
