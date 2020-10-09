@@ -1,185 +1,123 @@
-import * as facemesh from './facemesh/facemesh';
-import * as dat from 'dat.gui';
+import 'regenerator-runtime/runtime';
+import { DatasetController } from "./dataset-controller";
+import * as facegaze from "./facegaze/facegaze";
+import * as facemesh from "./facemesh/facemesh";
+import { CalibrationRenderer } from "./renderers/calibration-renderer";
+import { PredictionRenderer } from "./renderers/prediction-renderer";
+import { GUI } from 'dat.gui';
 import Stats from 'stats.js';
 import * as tf from '@tensorflow/tfjs';
-import * as facegaze from './facegaze';
-import 'regenerator-runtime/runtime';
-import { Renderer } from "./renderer";
-import { DatasetController } from "./dataset-controller";
-import {CalibrationRenderer} from "./calibration-renderer";
-import {FaceGaze} from "./facegaze";
 
-function isMobile() {
-	const isAndroid = /Android/i.test(navigator.userAgent);
-	const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-	return isAndroid || isiOS;
+export class Main {
+  // HTML Elements
+  private mainElement: HTMLElement;
+  private video: HTMLVideoElement;
+  private canvas: HTMLCanvasElement;
+  private canvasContainer: HTMLElement;
+  private calibrationCanvas: HTMLCanvasElement;
+  // Renderers
+  private predictionRenderer: PredictionRenderer;
+  private calibrationRenderer: CalibrationRenderer;
+  // Controllers
+  private datasetController: DatasetController;
+  private stats = new Stats();
+  private gui = new GUI();
+  // Application State
+  private state = { backend: 'webgl', maxFaces: 1, predictIrises: true, mode: 'predict' };
+  // Models
+  private model: facemesh.FaceMesh;
+  private gazeModel: facegaze.FaceGaze;
+  private videoWidth = 224;
+  private videoHeight = 224;
+
+  constructor() {
+    // Common Components
+    this.canvasContainer = document.querySelector('.canvas-wrapper');
+    this.mainElement = document.getElementById('main');
+    // Prediction Components
+    this.video = <HTMLVideoElement>document.getElementById('video');
+    this.canvas = <HTMLCanvasElement>document.getElementById('output');
+    this.predictionRenderer = new PredictionRenderer(this.video, this.canvas);
+    // Calibration Components
+    this.datasetController = new DatasetController();
+    this.calibrationCanvas = <HTMLCanvasElement>document.getElementById("calibration-canvas");
+    this.calibrationRenderer = new CalibrationRenderer(this.calibrationCanvas);
+  }
+
+  private async start(mode: string) {
+    if (mode == 'predict') {
+      console.log("predicting");
+      document.getElementById("training").style.display = "none";
+      document.getElementById("prediction").style.display = "block";
+      this.canvasContainer.setAttribute('style', `width: ${this.videoWidth}px; height: ${this.videoHeight}px`);
+      this.calibrationRenderer.stopCalibration();
+      this.calibrationRenderer.stopRender();
+      await this.predictionRenderer.startRender(this.stats, [this.model, this.gazeModel], this.video, this.state);
+    }
+    else {
+      console.log('training');
+      document.getElementById("training").style.display = "block";
+      document.getElementById("prediction").style.display = "none";
+      this.predictionRenderer.stopRender();
+      await this.calibrationRenderer.startRender(this.stats, this.model, this.video, this.state);
+      this.calibrationRenderer.startCalibration();
+    }
+  }
+
+  private isMobile() {
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isiOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    return isAndroid || isiOS;
+  }
+
+  private async setupCamera() {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        deviceId: '463c9125011ecfedab1a2cf9b33046959ccc8ab3b1821a94c16f9151d8315ab5',
+        facingMode: 'user',
+        width: this.videoWidth,
+        height: this.videoHeight
+      },
+    });
+    this.video.srcObject = stream;
+    await new Promise((resolve) => {
+      this.video.onloadedmetadata = () => {
+        this.video.width = this.videoWidth;
+        this.video.height = this.videoHeight;
+        this.canvas.width = this.videoWidth;
+        this.canvas.height = this.videoHeight;
+        this.video.play();
+        resolve(this.video);
+      };
+    });
+  }
+
+  private async setupDatGUI() {
+    this.gui.add(this.state, 'maxFaces', 1, 20, 1).onChange(async (val) => {
+      this.model = await facemesh.load({ maxFaces: val })
+    });
+    this.gui.add(this.state, 'predictIrises');
+
+    this.gui.add(this.state, 'mode', ['predict', 'train']).onChange(mode => {
+      this.start(mode);
+    });
+  }
+
+  private async setupStatsGUI() {
+    this.stats.showPanel(0);  // 0: fps, 1: ms, 2: mb, 3+: custom
+    this.mainElement.appendChild(this.stats.dom);
+  }
+
+  public async run() {
+    await tf.setBackend(this.state.backend);
+    await this.setupDatGUI();
+    await this.setupStatsGUI();
+    await this.setupCamera();
+    this.model = await facemesh.load({ maxFaces: this.state.maxFaces });
+    this.gazeModel = await facegaze.load();
+    this.start(this.state.mode);
+  }
 }
 
-let renderer: Renderer;
-let calibrationRenderer: CalibrationRenderer;
-let datasetController: DatasetController;
-let requestId: number;
-let model: facemesh.FaceMesh;
-let gazeModel: facegaze.FaceGaze;
-let videoWidth: number;
-let videoHeight: number;
-let video: HTMLVideoElement;
-let canvas: HTMLCanvasElement;
-let calibrationCanvas: HTMLCanvasElement;
-
-const VIDEO_SIZE = 224;
-const mobile = isMobile();
-// Don't render the point cloud on mobile in order to maximize performance and
-// to avoid crowding limited screen space.
-const stats = new Stats();
-const state = {
-	backend: 'webgl',
-	maxFaces: 1,
-	predictIrises: true,
-	mode: 'predict'
-};
-
-function setupDatGui() {
-	const gui = new dat.GUI();
-
-	gui.add(state, 'maxFaces', 1, 20, 1).onChange(async val => model = await facemesh.load({ maxFaces: val }));
-	gui.add(state, 'predictIrises');
-
-	gui.add(state, 'mode', ['predict', 'train']).onChange(mode => {
-		start(mode);
-		// if(mode == 'train'){
-		// 	datasetController.addTrainingSample(tf.tensor2d([[1, 2, 3]]), tf.tensor1d([4, 5]));
-		// }
-	});
-}
-
-async function setupCamera() {
-	video = <HTMLVideoElement>document.getElementById('video');
-
-	const stream = await navigator.mediaDevices.getUserMedia({
-		audio: false,
-		video: {
-			deviceId: '463c9125011ecfedab1a2cf9b33046959ccc8ab3b1821a94c16f9151d8315ab5',
-			facingMode: 'user',
-			// Only setting the video to a specified size in order to accommodate a
-			// point cloud, so on mobile devices accept the default size.
-			width: mobile ? undefined : VIDEO_SIZE,
-			height: mobile ? undefined : VIDEO_SIZE
-		},
-	});
-	video.srcObject = stream;
-
-	return new Promise((resolve) => {
-		video.onloadedmetadata = () => {
-			resolve(video);
-		};
-	});
-}
-
-async function predictRender() {
-	stats.begin();
-
-	const returnTensors = false;
-	const flipHorizontal = false;
-
-	const predictions = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
-
-	if (predictions.length > 0){
-		const predictionMeshes = predictions.map(p => p.scaledMesh);
-		const gazePoints = gazeModel.estimateGaze(predictionMeshes);
-
-		// console.log(gazePoints);
-	}
-
-
-	renderer.renderPrediction(predictions);
-
-	stats.end();
-	requestId = requestAnimationFrame(predictRender);
-}
-
-async function calibrateRender(){
-
-	stats.begin();
-
-	const returnTensors = false;
-	const flipHorizontal = false;
-
-	const predictions = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
-
-	if(calibrationRenderer.getCurrent()){
-		const meshes = predictions.map(p => p.scaledMesh);
-		const current = calibrationRenderer.getCurrent();
-		requestId = requestAnimationFrame(calibrateRender);
-		// requestId = requestAnimationFrame(calibrateRender);
-	}
-
-	stats.end();
-
-}
-
-
-async function start(mode: string) {
-
-	if (requestId) {
-		cancelAnimationFrame(requestId);
-
-		console.log("cancelling request id "+ requestId);
-	}
-
-	if (mode == 'predict') {
-		console.log("predicting");
-
-		document.getElementById("training").style.display = "none";
-		document.getElementById("prediction").style.display = "block";
-
-		const canvasContainer = document.querySelector('.canvas-wrapper');
-
-		canvasContainer.setAttribute('style', `width: ${videoWidth}px; height: ${videoHeight}px`);
-		calibrationRenderer.stopRender();
-		await predictRender();
-	}
-	else {
-		console.log('training');
-
-		document.getElementById("training").style.display = "block";
-		document.getElementById("prediction").style.display = "none";
-
-		calibrationRenderer.startRender();
-
-		await calibrateRender();
-
-
-	}
-
-}
-
-async function main() {
-	await tf.setBackend(state.backend);
-	setupDatGui();
-
-	stats.showPanel(0);  // 0: fps, 1: ms, 2: mb, 3+: custom
-	document.getElementById('main').appendChild(stats.dom);
-
-	await setupCamera();
-	video.play();
-
-	canvas = <HTMLCanvasElement>document.getElementById('output');
-
-	calibrationCanvas = <HTMLCanvasElement>document.getElementById("calibration-canvas")
-
-	renderer = new Renderer(video, canvas)
-
-	calibrationRenderer = new CalibrationRenderer(calibrationCanvas);
-
-	datasetController = new DatasetController();
-
-	model = await facemesh.load({ maxFaces: state.maxFaces });
-
-	gazeModel =  new FaceGaze();
-
-	start(state.mode);
-
-}
-
-main();
+new Main().run();
