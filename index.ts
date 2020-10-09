@@ -27,7 +27,7 @@ let video: HTMLVideoElement;
 let canvas: HTMLCanvasElement;
 let calibrationCanvas: HTMLCanvasElement;
 
-const VIDEO_SIZE = 500;
+const VIDEO_SIZE = 224;
 const mobile = isMobile();
 // Don't render the point cloud on mobile in order to maximize performance and
 // to avoid crowding limited screen space.
@@ -82,10 +82,14 @@ async function predictRender() {
 	const flipHorizontal = false;
 
 	const predictions = await model.estimateFaces(video, returnTensors, flipHorizontal, state.predictIrises);
-	const predictionMeshes = predictions.map(p => p.scaledMesh);
-	const gazePoints = gazeModel.estimateGaze(predictionMeshes);
 
-	console.log(gazePoints);
+	if (predictions.length > 0){
+		const predictionMeshes = predictions.map(p => p.scaledMesh);
+		const gazePoints = gazeModel.estimateGaze(predictionMeshes);
+
+		// console.log(gazePoints);
+	}
+
 
 	renderer.renderPrediction(predictions);
 
@@ -106,7 +110,7 @@ async function calibrateRender(){
 		const meshes = predictions.map(p => p.scaledMesh);
 		const current = calibrationRenderer.getCurrent();
 		requestId = requestAnimationFrame(calibrateRender);
-		requestId = requestAnimationFrame(calibrateRender);
+		// requestId = requestAnimationFrame(calibrateRender);
 	}
 
 	stats.end();
@@ -136,12 +140,14 @@ async function start(mode: string) {
 	else {
 		console.log('training');
 
+		document.getElementById("training").style.display = "block";
+		document.getElementById("prediction").style.display = "none";
+
 		calibrationRenderer.startRender();
 
 		await calibrateRender();
 
-		document.getElementById("training").style.display = "block";
-		document.getElementById("prediction").style.display = "none";
+
 	}
 
 }
