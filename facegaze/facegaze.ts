@@ -8,14 +8,24 @@ export class FaceGaze {
 
   constructor() {
     this.model.add(tf.layers.flatten({ inputShape: [478, 3] }))
+    this.model.add(tf.layers.dense({ units: 16, activation: 'relu' }));
     this.model.add(tf.layers.dense({ units: 2, activation: 'sigmoid' }));
-    this.model.compile({ loss: losses.meanSquaredError, optimizer: 'adam' });
+    this.model.compile({ loss: losses.meanSquaredError, optimizer: 'adam'});
   }
 
   public estimateGaze(input: (Coords3D | tf.Tensor2D)[]) {
     const inputTensor = tf.tensor3d(<Coords3D[]>input);
     const outputTensor = this.model.predictOnBatch(inputTensor) as tf.Tensor2D;
     return outputTensor.dataSync<"float32">();
+  }
+
+  public fit(data, labels){
+    this.model.fit(data, labels, {
+      epochs: 50,
+      batchSize: 16
+    }).then(info => {
+      console.log(info);
+    });
   }
 
 };

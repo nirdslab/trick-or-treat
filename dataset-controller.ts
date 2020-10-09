@@ -3,29 +3,39 @@ import * as tf from '@tensorflow/tfjs-core';
 
 export class DatasetController {
 
-  private xs: Tensor2D;
-  private ys: Tensor1D;
+  private xs: Array<Array<number>> = [];
+  private ys: Array<Array<number>> = [];
 
   constructor() { }
 
-  addTrainingSample(sample: Tensor2D, prediction: Tensor1D) {
+  addTrainingSample(facemesh: Array<number>, screenpoint: Array<number>) {
 
-    if (this.xs == null) {
-      this.xs = tf.keep(sample.expandDims(0))
-      this.ys = tf.keep(prediction.expandDims(0))
-    }
-    else {
-      const oldXs = this.xs;
-      const oldYs = this.ys;
+    this.xs.push(facemesh);
+    this.ys.push(screenpoint)
 
-      this.xs = tf.keep(oldXs.concat(sample.expandDims(0), 0));
-      this.ys = tf.keep(oldYs.concat(prediction.expandDims(0), 0));
+    //
+    // if (this.xs == null) {
+    //   this.xs = tf.keep(sample.expandDims(0))
+    //   this.ys = tf.keep(prediction.expandDims(0))
+    // }
+    // else {
+    //   const oldXs = this.xs;
+    //   const oldYs = this.ys;
+    //
+    //
+    //   this.xs = tf.keep(oldXs.concat(sample.expandDims(0), 0));
+    //   this.ys = tf.keep(oldYs.concat(prediction.expandDims(0), 0));
+    //
+    //   oldXs.dispose();
+    //   oldYs.dispose();
+    // }
 
-      oldXs.dispose();
-      oldYs.dispose();
-    }
+  }
 
-    console.log(this.xs.shape);
-
+  getTrainingTensors(){
+    return [
+        tf.tensor(this.xs),
+        tf.tensor(this.ys)
+    ];
   }
 }

@@ -38,14 +38,16 @@ export class CalibrationRenderer {
     console.log("Calibration Points - ", this.calibPoints.length);
   }
 
-  startCalibration() {
+  startCalibration(onComplete) {
     this.index = 0;
     // let calibPoint = this.calibPoints[this.index];
     // this.drawBall(calibPoint[0], calibPoint[1]);
     console.log(this.index)
     this.interval = setInterval(() => {
-      this.increment(this)
-    }, 3000);
+      if(this.increment(this)){
+        onComplete();
+      }
+    }, 2000);
 
   }
 
@@ -68,15 +70,17 @@ export class CalibrationRenderer {
 
   }
 
-  increment(c) {
+  increment(c): boolean {
     console.log(c.index);
     if (c.index < 9) {
       let points = c.calibPoints[c.index]
       c.drawBall(points[0], points[1]);
       c.index = c.index + 1;
+      return false;
     }
     else {
       this.stopCalibration();
+      return true;
     }
 
   }
@@ -95,7 +99,7 @@ export class CalibrationRenderer {
         const estimatedFaces = await model.estimateFaces(video, false, false, state.predictIrises);
         const meshes = estimatedFaces.map(p => p.scaledMesh);
         if (meshes.length > 0) {
-          this.datasetController.addTrainingSample(tf.tensor2d(<any>meshes[0]), tf.tensor1d(calibPoint))
+          this.datasetController.addTrainingSample(meshes[0], [calibPoint[0]/ this.canvas.width, calibPoint[1]/this.canvas.height]);
         }
       }
       stats.end();

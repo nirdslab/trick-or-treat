@@ -57,7 +57,11 @@ export class Main {
       document.getElementById("prediction").style.display = "none";
       this.predictionRenderer.stopRender();
       await this.calibrationRenderer.startRender(this.stats, this.model, this.video, this.state);
-      this.calibrationRenderer.startCalibration();
+      this.calibrationRenderer.startCalibration(() => {
+        console.log("Training");
+        const trainingData = this.datasetController.getTrainingTensors();
+        this.gazeModel.fit(trainingData[0], trainingData[1]);
+      });
     }
   }
 
