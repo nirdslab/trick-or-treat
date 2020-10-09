@@ -55,6 +55,7 @@ export class CalibrationRenderer {
     if (this.interval) {
       clearInterval(this.interval);
       console.log("Stopping calibration render - Interval cleared");
+      this.running = false;
     }
     this.index = 0;
   }
@@ -99,6 +100,7 @@ export class CalibrationRenderer {
         const estimatedFaces = await model.estimateFaces(video, false, false, state.predictIrises);
         const meshes = estimatedFaces.map(p => p.scaledMesh);
         if (meshes.length > 0) {
+          console.log("Sample", meshes[0], [calibPoint[0]/ this.canvas.width, calibPoint[1]/this.canvas.height])
           this.datasetController.addTrainingSample(meshes[0], [calibPoint[0]/ this.canvas.width, calibPoint[1]/this.canvas.height]);
         }
       }

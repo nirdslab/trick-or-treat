@@ -4,12 +4,25 @@ import { Coords3D } from '../facemesh/util';
 
 export class FaceGaze {
 
-  private model = tf.sequential()
+  private model: tf.LayersModel;
 
   constructor() {
-    this.model.add(tf.layers.flatten({ inputShape: [478, 3] }))
-    this.model.add(tf.layers.dense({ units: 16, activation: 'relu' }));
-    this.model.add(tf.layers.dense({ units: 2, activation: 'sigmoid' }));
+
+
+  }
+
+  async init(){
+
+    this.model = await tf.loadLayersModel('localstorage://facegaze').catch(async () => {
+      const testModel = tf.sequential();
+      testModel.add(tf.layers.flatten({ inputShape: [478, 3] }))
+      testModel.add(tf.layers.dense({ units: 16, activation: 'relu' }));
+      testModel.add(tf.layers.dense({ units: 2, activation: 'sigmoid' }));
+      testModel.compile({ loss: losses.meanSquaredError, optimizer: 'adam'});
+      await testModel.save('localstorage://facegaze');
+      return await tf.loadLayersModel('localstorage://facegaze');
+    });
+
     this.model.compile({ loss: losses.meanSquaredError, optimizer: 'adam'});
   }
 
@@ -22,9 +35,12 @@ export class FaceGaze {
   public fit(data, labels){
     this.model.fit(data, labels, {
       epochs: 50,
-      batchSize: 16
+      batchSize: 16,
+      shuffle: true
     }).then(info => {
       console.log(info);
+      return this.model.save('localstorage://facegaze')
+
     });
   }
 
@@ -32,6 +48,7 @@ export class FaceGaze {
 
 export async function load() {
   return new Promise<FaceGaze>((resolve) => {
-    resolve(new FaceGaze());
+    const f = new FaceGaze();
+    f.init().then(() => {resolve(f)});
   })
 }
