@@ -11,7 +11,7 @@ export class PredictionRenderer {
   private ctx: CanvasRenderingContext2D;
   private video: HTMLVideoElement;
   private canvas: HTMLCanvasElement;
-  private requestId: number;
+  private running = false;
 
   constructor(
     video: HTMLVideoElement,
@@ -103,21 +103,26 @@ export class PredictionRenderer {
   }
 
   public async startRender(stats: Stats, models: [FaceMesh, FaceGaze], video: HTMLVideoElement, state: any) {
-    stats.begin();
-    const predictions = await models[0].estimateFaces(video, false, false, state.predictIrises);
-    if (predictions.length > 0) {
-      const predictionMeshes = predictions.map(p => p.scaledMesh);
-      const gazePoints = models[1].estimateGaze(predictionMeshes);
-      console.log(gazePoints);
+    this.running = true;
+    const render = async () => {
+      if (this.running) {
+        stats.begin();
+        const predictions = await models[0].estimateFaces(video, false, false, state.predictIrises);
+        if (predictions.length) {
+          const predictionMeshes = predictions.map(p => p.scaledMesh);
+          const gazePoints = models[1].estimateGaze(predictionMeshes);
+          console.log(...gazePoints);
+        }
+        this.renderPrediction(predictions);
+        stats.end();
+        requestAnimationFrame(render);
+      }
     }
-    this.renderPrediction(predictions);
-
-    stats.end();
-    this.requestId = requestAnimationFrame(() => this.startRender(stats, models, video, state));
+    render();
   }
 
   public stopRender() {
-    cancelAnimationFrame(this.requestId);
+    this.running = false;
   }
 
 }
