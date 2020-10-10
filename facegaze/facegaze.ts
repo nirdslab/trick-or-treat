@@ -27,10 +27,9 @@ export class FaceGaze {
     this.model.compile({ loss: losses.meanSquaredError, optimizer: 'adam' });
   }
 
-  public estimateGaze(meshes: Coords3D[]): Float32Array {
-    let inputTensor = tf.tensor3d(meshes.map(mesh => mesh.slice(468, mesh.length)), [meshes.length, this.POINTS, this.DIMS]);
-    const outputTensor = this.model.predict(inputTensor) as tf.Tensor2D;
-    return outputTensor.dataSync<"float32">();
+  public estimateGaze(meshes: tf.Tensor2D[]): tf.Tensor2D {
+    const meshTensor = tf.stack(meshes.map(mesh => mesh.slice([468, 0], [this.POINTS, this.DIMS])));
+    return this.model.predict(meshTensor) as tf.Tensor2D;
   }
 
   public async fit(data: tf.Tensor3D, labels: tf.Tensor2D) {

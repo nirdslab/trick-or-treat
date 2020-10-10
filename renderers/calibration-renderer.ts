@@ -1,6 +1,5 @@
 import { DatasetController } from "../dataset-controller";
 import { FaceMesh } from "../facemesh/facemesh";
-import { Coords3D } from "../facemesh/util";
 
 export class CalibrationRenderer {
 
@@ -43,7 +42,7 @@ export class CalibrationRenderer {
     // this.drawBall(calibPoint[0], calibPoint[1]);
     console.log(this.index)
     this.interval = setInterval(() => {
-      if(this.increment(this)){
+      if (this.increment()) {
         onComplete();
       }
     }, 2000);
@@ -70,12 +69,12 @@ export class CalibrationRenderer {
 
   }
 
-  increment(c): boolean {
-    console.log(c.index);
-    if (c.index < 9) {
-      let points = c.calibPoints[c.index]
-      c.drawBall(points[0], points[1]);
-      c.index = c.index + 1;
+  increment(): boolean {
+    console.log(this.index);
+    if (this.index < 9) {
+      let points = this.calibPoints[this.index]
+      this.drawBall(points[0], points[1]);
+      this.index = this.index + 1;
       return false;
     }
     else {
@@ -89,17 +88,17 @@ export class CalibrationRenderer {
     return this.calibPoints[this.index];
   }
 
-  public async startRender(stats: Stats, model: FaceMesh, video: HTMLVideoElement, state: any) {
+  public async startRender(stats: Stats, model: FaceMesh, video: HTMLVideoElement) {
     this.running = true;
     const render = async () => {
       if (!this.running) return;
       stats.begin();
       let calibPoint = this.getCurrent();
       if (calibPoint) {
-        const estimatedFaces = await model.estimateFaces(video, false, false, state.predictIrises);
-        const meshes = estimatedFaces.map(p => p.scaledMesh) as Coords3D[];
+        const estimatedFaces = await model.estimateFaces(video, false, true);
+        const meshes = estimatedFaces.map(p => p.scaledMesh);
         if (meshes.length > 0) {
-          this.datasetController.addTrainingSample(meshes, [calibPoint[0]/ this.gazeCanvas.width, calibPoint[1]/this.gazeCanvas.height]);
+          this.datasetController.addTrainingSample(meshes, [calibPoint[0] / this.gazeCanvas.width, calibPoint[1] / this.gazeCanvas.height]);
         }
       }
       stats.end();

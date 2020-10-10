@@ -54,7 +54,7 @@ export class Main {
       // Logic
       this.calibrationRenderer.stopCalibration();
       this.calibrationRenderer.stopRender();
-      await this.predictionRenderer.startRender(this.stats, [this.model, this.gazeModel], this.video, this.state);
+      await this.predictionRenderer.startRender(this.stats, [this.model, this.gazeModel], this.video);
     }
     else {
       console.log('calibrating');
@@ -64,7 +64,7 @@ export class Main {
       this.faceCanvas.hidden = true;
       // Logic
       this.predictionRenderer.stopRender();
-      await this.calibrationRenderer.startRender(this.stats, this.model, this.video, this.state);
+      await this.calibrationRenderer.startRender(this.stats, this.model, this.video);
       this.calibrationRenderer.startCalibration(async () => {
         console.log("training");
         const trainingData = this.datasetController.getTrainingTensors();

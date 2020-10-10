@@ -1,7 +1,6 @@
 import { FaceGaze } from "../facegaze/facegaze";
-import { FaceMesh } from "../facemesh/facemesh";
+import { AnnotatedPredictionTensors, FaceMesh } from "../facemesh/facemesh";
 import * as tf from "@tensorflow/tfjs";
-import { Coords3D } from "../facemesh/util";
 
 const NUM_KEYPOINTS = 468;
 const NUM_IRIS_KEYPOINTS = 5;
@@ -30,14 +29,14 @@ export class PredictionRenderer {
     this.initContext();
   }
 
-  async renderPrediction(frame: tf.Tensor3D, predictions: any[]) {
+  async renderPrediction(frame: tf.Tensor3D, predictions: AnnotatedPredictionTensors[]) {
 
     await tf.browser.toPixels(frame, this.faceCanvas);
 
     if (predictions.length > 0) {
       predictions.forEach(prediction => {
 
-        const keypoints = prediction.scaledMesh;
+        const keypoints = prediction.scaledMesh.arraySync();
 
         this.faceCtx.fillStyle = GREEN;
         for (let i = 0; i < NUM_KEYPOINTS; i++) {
@@ -112,16 +111,16 @@ export class PredictionRenderer {
 
   }
 
-  public async startRender(stats: Stats, models: [FaceMesh, FaceGaze], video: HTMLVideoElement, state: any) {
+  public async startRender(stats: Stats, [faceModel, gazeModel]: [FaceMesh, FaceGaze], video: HTMLVideoElement) {
     this.running = true;
     const render = async () => {
       if (this.running) {
         stats.begin();
         const frame = tf.browser.fromPixels(video);
-        const predictions = await models[0].estimateFaces(frame, false, false, true);
+        const predictions = await faceModel.estimateFaces(frame, false, true);
         if (predictions.length) {
-          const predictionMeshes = predictions.map(p => (p.scaledMesh as Coords3D));
-          const gazePoints = models[1].estimateGaze(predictionMeshes);
+          const meshes = predictions.map(p => (p.scaledMesh));
+          const gazePoints = gazeModel.estimateGaze(meshes);
           const [x, y] = [gazePoints[0] * this.gazeCanvas.width, gazePoints[1] * this.gazeCanvas.height];
           this.drawGazePoint(x, y);
         }

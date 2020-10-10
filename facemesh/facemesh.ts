@@ -4,7 +4,7 @@ import * as tf from '@tensorflow/tfjs-core';
 
 import { MESH_ANNOTATIONS } from './keypoints';
 import { Pipeline, Prediction } from './pipeline';
-import { Coord2D, Coords3D } from './util';
+import { Coord2D } from './util';
 import { UV_COORDS } from './uv_coords';
 
 const FACEMESH_GRAPHMODEL_PATH = 'https://tfhub.dev/mediapipe/tfjs-model/facemesh/1/default/1';
@@ -12,33 +12,13 @@ const IRIS_GRAPHMODEL_PATH = 'https://tfhub.dev/mediapipe/tfjs-model/iris/1/defa
 const MESH_MODEL_INPUT_WIDTH = 192;
 const MESH_MODEL_INPUT_HEIGHT = 192;
 
-interface AnnotatedPredictionValues {
-  /** Probability of the face detection. */
-  faceInViewConfidence: number;
-  boundingBox: {
-    /** The upper left-hand corner of the face. */
-    topLeft: Coord2D,
-    /** The lower right-hand corner of the face. */
-    bottomRight: Coord2D
-  };
-  /** Facial landmark coordinates. */
-  mesh: Coords3D;
-  /** Facial landmark coordinates normalized to input dimensions. */
-  scaledMesh: Coords3D;
-  /** Annotated keypoints. */
-  annotations?: { [key: string]: Coords3D };
-}
-
-interface AnnotatedPredictionTensors {
+// The object returned by facemesh describing a face found in the input.
+export interface AnnotatedPredictionTensors {
   faceInViewConfidence: number;
   boundingBox: { topLeft: tf.Tensor1D, bottomRight: tf.Tensor1D };
   mesh: tf.Tensor2D;
   scaledMesh: tf.Tensor2D;
 }
-
-// The object returned by facemesh describing a face found in the input.
-export type AnnotatedPrediction =
-  AnnotatedPredictionValues | AnnotatedPredictionTensors;
 
 /**
  * Load the model.
@@ -66,27 +46,17 @@ export async function load({
   scoreThreshold = 0.75,
   shouldLoadIrisModel = true
 } = {}): Promise<FaceMesh> {
-  let models;
+  let models: any[];
   if (shouldLoadIrisModel) {
-    models = await Promise.all([
-      loadDetectorModel(maxFaces, iouThreshold, scoreThreshold),
-      loadMeshModel(), loadIrisModel()
-    ]);
+    models = await Promise.all([loadDetectorModel(maxFaces, iouThreshold, scoreThreshold), loadMeshModel(), loadIrisModel()]);
   } else {
-    models = await Promise.all([
-      loadDetectorModel(maxFaces, iouThreshold, scoreThreshold), loadMeshModel()
-    ]);
+    models = await Promise.all([loadDetectorModel(maxFaces, iouThreshold, scoreThreshold), loadMeshModel()]);
   }
-
-  const faceMesh = new FaceMesh(
-    models[0], models[1], maxContinuousChecks, detectionConfidence, maxFaces,
-    shouldLoadIrisModel ? models[2] : null);
+  const faceMesh = new FaceMesh(models[0], models[1], maxContinuousChecks, detectionConfidence, maxFaces, shouldLoadIrisModel ? models[2] : null);
   return faceMesh;
 }
 
-async function loadDetectorModel(
-  maxFaces: number, iouThreshold: number,
-  scoreThreshold: number): Promise<blazeface.BlazeFaceModel> {
+async function loadDetectorModel(maxFaces: number, iouThreshold: number, scoreThreshold: number): Promise<blazeface.BlazeFaceModel> {
   return blazeface.load({ maxFaces, iouThreshold, scoreThreshold });
 }
 
@@ -98,79 +68,40 @@ async function loadIrisModel(): Promise<tfconv.GraphModel> {
   return tfconv.loadGraphModel(IRIS_GRAPHMODEL_PATH, { fromTFHub: true });
 }
 
-function getInputTensorDimensions(input: tf.Tensor3D | ImageData | HTMLVideoElement |
-  HTMLImageElement | HTMLCanvasElement): Coord2D {
-  return input instanceof tf.Tensor ? [input.shape[0], input.shape[1]] :
-    [input.height, input.width];
+function getInputTensorDimensions(input: tf.Tensor3D | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement): Coord2D {
+  return input instanceof tf.Tensor ? [input.shape[0], input.shape[1]] : [input.height, input.width];
 }
 
-function flipFaceHorizontal(
-  face: AnnotatedPrediction, imageWidth: number): AnnotatedPrediction {
-  if (face.mesh instanceof tf.Tensor) {
-    const [topLeft, bottomRight, mesh, scaledMesh] = tf.tidy(() => {
-      const subtractBasis = tf.tensor1d([imageWidth - 1, 0, 0]);
-      const multiplyBasis = tf.tensor1d([1, -1, 1]);
+function flipFaceHorizontal(face: AnnotatedPredictionTensors, imageWidth: number): AnnotatedPredictionTensors {
+  const [topLeft, bottomRight, mesh, scaledMesh] = tf.tidy(() => {
+    const subtractBasis = tf.tensor1d([imageWidth - 1, 0, 0]);
+    const multiplyBasis = tf.tensor1d([1, -1, 1]);
 
-      return tf.tidy(() => {
-        return [
-          tf.concat([
-            tf.sub(
-              imageWidth - 1,
-              (face.boundingBox.topLeft as tf.Tensor1D).slice(0, 1)),
-            (face.boundingBox.topLeft as tf.Tensor1D).slice(1, 1)
-          ]),
-          tf.concat([
-            tf.sub(
-              imageWidth - 1,
-              (face.boundingBox.bottomRight as tf.Tensor1D).slice(0, 1)),
-            (face.boundingBox.bottomRight as tf.Tensor1D).slice(1, 1)
-          ]),
-          tf.sub(subtractBasis, face.mesh).mul(multiplyBasis),
-          tf.sub(subtractBasis, face.scaledMesh).mul(multiplyBasis)
-        ];
-      });
+    return tf.tidy(() => {
+      return [
+        tf.concat([
+          tf.sub(imageWidth - 1, (face.boundingBox.topLeft as tf.Tensor1D).slice(0, 1)),
+          (face.boundingBox.topLeft as tf.Tensor1D).slice(1, 1)
+        ]),
+        tf.concat([
+          tf.sub(imageWidth - 1, (face.boundingBox.bottomRight as tf.Tensor1D).slice(0, 1)),
+          (face.boundingBox.bottomRight as tf.Tensor1D).slice(1, 1)
+        ]),
+        tf.sub(subtractBasis, face.mesh).mul(multiplyBasis),
+        tf.sub(subtractBasis, face.scaledMesh).mul(multiplyBasis)
+      ];
     });
-
-    return Object.assign(
-      {}, face, { boundingBox: { topLeft, bottomRight }, mesh, scaledMesh });
-  }
-
-  return Object.assign({}, face, {
-    boundingBox: {
-      topLeft: [
-        imageWidth - 1 - (face.boundingBox.topLeft as [number, number])[0],
-        (face.boundingBox.topLeft as [number, number])[1]
-      ],
-      bottomRight: [
-        imageWidth - 1 - (face.boundingBox.bottomRight as [number, number])[0],
-        (face.boundingBox.bottomRight as [number, number])[1]
-      ]
-    },
-    mesh: (face.mesh).map(coord => {
-      const flippedCoord = coord.slice(0);
-      flippedCoord[0] = imageWidth - 1 - coord[0];
-      return flippedCoord;
-    }),
-    scaledMesh: (face.scaledMesh as Coords3D).map(coord => {
-      const flippedCoord = coord.slice(0);
-      flippedCoord[0] = imageWidth - 1 - coord[0];
-      return flippedCoord;
-    })
   });
+
+  return Object.assign({}, face, { boundingBox: { topLeft, bottomRight }, mesh, scaledMesh });
 }
 
 export class FaceMesh {
   private pipeline: Pipeline;
   private detectionConfidence: number;
 
-  constructor(
-    blazeFace: blazeface.BlazeFaceModel, blazeMeshModel: tfconv.GraphModel,
-    maxContinuousChecks: number, detectionConfidence: number,
-    maxFaces: number, irisModel: tfconv.GraphModel | null) {
-    this.pipeline = new Pipeline(
-      blazeFace, blazeMeshModel, MESH_MODEL_INPUT_WIDTH,
-      MESH_MODEL_INPUT_HEIGHT, maxContinuousChecks, maxFaces, irisModel);
-
+  constructor(blazeFace: blazeface.BlazeFaceModel, blazeMeshModel: tfconv.GraphModel, maxContinuousChecks: number, detectionConfidence: number, maxFaces: number, irisModel: tfconv.GraphModel | null) {
+    this.pipeline = new Pipeline(blazeFace, blazeMeshModel, MESH_MODEL_INPUT_WIDTH, MESH_MODEL_INPUT_HEIGHT, maxContinuousChecks, maxFaces, irisModel);
     this.detectionConfidence = detectionConfidence;
   }
 
@@ -201,11 +132,7 @@ export class FaceMesh {
    *
    * @return An array of AnnotatedPrediction objects.
    */
-  async estimateFaces(
-    input: tf.Tensor3D | ImageData | HTMLVideoElement | HTMLImageElement |
-      HTMLCanvasElement,
-    returnTensors = false, flipHorizontal = false,
-    predictIrises = true): Promise<AnnotatedPrediction[]> {
+  async estimateFaces(input: tf.Tensor3D | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, flipHorizontal = false, predictIrises = true): Promise<AnnotatedPredictionTensors[]> {
     if (predictIrises && this.pipeline.irisModel == null) {
       throw new Error(
         'The iris model was not loaded as part of facemesh. ' +
@@ -222,82 +149,33 @@ export class FaceMesh {
       return (input as tf.Tensor).toFloat().expandDims(0);
     });
 
-    let predictions: Prediction[];
-    if (tf.getBackend() === 'webgl') {
-      // Currently tfjs-core does not pack depthwiseConv because it fails for
-      // very large inputs (https://github.com/tensorflow/tfjs/issues/1652).
-      // TODO(annxingyuan): call tf.enablePackedDepthwiseConv when available
-      // (https://github.com/tensorflow/tfjs/issues/2821)
-      const savedWebglPack = tf.env().get('WEBGL_PACK');
-      tf.env().set('WEBGL_PACK', true);
-      predictions = await this.pipeline.predict(image, predictIrises);
-      tf.env().set('WEBGL_PACK', savedWebglPack);
-    } else {
-      predictions = await this.pipeline.predict(image, predictIrises);
-    }
-
+    let predictions: Prediction[] = await this.pipeline.predict(image, predictIrises);
     image.dispose();
 
     if (predictions != null && predictions.length > 0) {
       return Promise.all(predictions.map(async (prediction: Prediction, i) => {
         const { coords, scaledCoords, box, flag } = prediction;
         let tensorsToRead: tf.Tensor[] = [flag];
-        if (!returnTensors) {
-          tensorsToRead = tensorsToRead.concat([coords, scaledCoords]);
-        }
-
-        const tensorValues = await Promise.all(
-          tensorsToRead.map(async (d: tf.Tensor) => d.array()));
+        const tensorValues = await Promise.all(tensorsToRead.map(async (d: tf.Tensor) => d.array()));
         const flagValue = tensorValues[0] as number;
 
         flag.dispose();
         if (flagValue < this.detectionConfidence) {
           this.pipeline.clearRegionOfInterest(i);
         }
-
-        if (returnTensors) {
-          const annotatedPrediction: AnnotatedPrediction = {
-            faceInViewConfidence: flagValue,
-            mesh: coords,
-            scaledMesh: scaledCoords,
-            boundingBox: {
-              topLeft: tf.tensor1d(box.startPoint),
-              bottomRight: tf.tensor1d(box.endPoint)
-            }
-          };
-
-          if (flipHorizontal) {
-            return flipFaceHorizontal(annotatedPrediction, width);
-          }
-
-          return annotatedPrediction;
-        }
-
-        const [coordsArr, coordsArrScaled] =
-          tensorValues.slice(1) as [Coords3D, Coords3D];
-
-        scaledCoords.dispose();
-        coords.dispose();
-
-        let annotatedPrediction: AnnotatedPredictionValues = {
+        const annotatedPrediction: AnnotatedPredictionTensors = {
           faceInViewConfidence: flagValue,
-          boundingBox: { topLeft: box.startPoint, bottomRight: box.endPoint },
-          mesh: coordsArr,
-          scaledMesh: coordsArrScaled
+          mesh: coords,
+          scaledMesh: scaledCoords,
+          boundingBox: {
+            topLeft: tf.tensor1d(box.startPoint),
+            bottomRight: tf.tensor1d(box.endPoint)
+          }
         };
 
         if (flipHorizontal) {
-          annotatedPrediction = flipFaceHorizontal(annotatedPrediction, width) as AnnotatedPredictionValues;
+          return flipFaceHorizontal(annotatedPrediction, width);
         }
-
-        const annotations: { [key: string]: Coords3D } = {};
-        for (const key in MESH_ANNOTATIONS) {
-          if (predictIrises || key.includes('Iris') === false) {
-            annotations[key] = MESH_ANNOTATIONS[key].map(
-              index => annotatedPrediction.scaledMesh[index]);
-          }
-        }
-        annotatedPrediction['annotations'] = annotations;
 
         return annotatedPrediction;
       }));

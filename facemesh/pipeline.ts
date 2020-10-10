@@ -246,8 +246,7 @@ export class Pipeline {
       const scaledBoxes =
         boxes.map((prediction: blazeface.BlazeFacePrediction): Box => {
           const predictionBoxCPU = {
-            startPoint: tf.squeeze(prediction.box.startPoint).arraySync() as
-              Coord2D,
+            startPoint: tf.squeeze(prediction.box.startPoint).arraySync() as Coord2D,
             endPoint: tf.squeeze(prediction.box.endPoint).arraySync() as Coord2D
           };
 
@@ -338,9 +337,7 @@ export class Pipeline {
             this.getEyeBox(
               rawCoords, face, RIGHT_EYE_BOUNDS[0], RIGHT_EYE_BOUNDS[1]);
 
-          const eyePredictions =
-            (this.irisModel.predict(
-              tf.concat([leftEyeCrop, rightEyeCrop]))) as tf.Tensor4D;
+          const eyePredictions = (this.irisModel.predict(tf.concat([leftEyeCrop, rightEyeCrop]))) as tf.Tensor4D;
           const eyePredictionsData = eyePredictions.dataSync() as Float32Array;
 
           const leftEyeData =
