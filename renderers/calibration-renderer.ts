@@ -1,113 +1,43 @@
-import { DatasetController } from "../dataset-controller";
-import { FaceMesh } from "../facemesh/facemesh";
+import {Renderer} from "./renderer";
 
-export class CalibrationRenderer {
+export class CalibrationRenderer extends Renderer<number, HTMLCanvasElement>{
 
-  private ctx: CanvasRenderingContext2D;
-  private calibPoints: Array<any>;
-  private index: number = 0;
-  private interval: NodeJS.Timeout;
-  private running = false;
+    private context: CanvasRenderingContext2D;
 
-  constructor(
-    private gazeCanvas: HTMLCanvasElement,
-    private datasetController: DatasetController
-  ) {
+    private calibPoints: Array<[number, number]>;
 
-    this.gazeCanvas.width = window.innerWidth;
-    this.gazeCanvas.height = window.innerHeight;
+    private circleRadius: number;
 
-    let xoffset = this.gazeCanvas.width * 0.1;
-    let yoffset = this.gazeCanvas.height * 0.1;
-
-    this.ctx = this.gazeCanvas.getContext('2d');
-
-    this.calibPoints = [
-      [xoffset, yoffset],
-      [this.gazeCanvas.width / 2, yoffset],
-      [this.gazeCanvas.width - xoffset, yoffset],
-      [xoffset, this.gazeCanvas.height / 2],
-      [this.gazeCanvas.width / 2, this.gazeCanvas.height / 2],
-      [this.gazeCanvas.width - xoffset, this.gazeCanvas.height / 2],
-      [xoffset, this.gazeCanvas.height - yoffset],
-      [this.gazeCanvas.width / 2, this.gazeCanvas.height - yoffset],
-      [this.gazeCanvas.width - xoffset, this.gazeCanvas.height - yoffset],
-    ]
-    console.log("Calibration Points - ", this.calibPoints.length);
-  }
-
-  startCalibration(onComplete: Function) {
-    this.index = 0;
-    // let calibPoint = this.calibPoints[this.index];
-    // this.drawBall(calibPoint[0], calibPoint[1]);
-    console.log(this.index)
-    this.interval = setInterval(() => {
-      if (this.increment()) {
-        onComplete();
-      }
-    }, 2000);
-
-  }
-
-  stopCalibration() {
-    if (this.interval) {
-      clearInterval(this.interval);
-      console.log("Stopping calibration render - Interval cleared");
-      this.running = false;
-    }
-    this.index = 0;
-  }
-
-  drawBall(x: number, y: number) {
-
-    this.ctx.clearRect(0, 0, this.gazeCanvas.width, this.gazeCanvas.height);
-    this.ctx.beginPath();
-    this.ctx.arc(x, y, 10, 0, Math.PI * 2);
-    this.ctx.fillStyle = "#0095DD";
-    this.ctx.fill();
-    this.ctx.closePath();
-
-  }
-
-  increment(): boolean {
-    console.log(this.index);
-    if (this.index < 9) {
-      let points = this.calibPoints[this.index]
-      this.drawBall(points[0], points[1]);
-      this.index = this.index + 1;
-      return false;
-    }
-    else {
-      this.stopCalibration();
-      return true;
+    constructor(htmlCanvasElement: HTMLCanvasElement) {
+        super(htmlCanvasElement);
+        this.context = this.renderElement.getContext('2d');
+        this.circleRadius = 10;
+        this.calibPoints = [
+            [0.1, 0.1],
+            [0.9, 0.1],
+            [0.5, 0.5],
+            [0.1, 0.9],
+            [0.9, 0.9],
+        ]
     }
 
-  }
-
-  getCurrent() {
-    return this.calibPoints[this.index];
-  }
-
-  public async startRender(stats: Stats, model: FaceMesh, video: HTMLVideoElement) {
-    this.running = true;
-    const render = async () => {
-      if (!this.running) return;
-      stats.begin();
-      let calibPoint = this.getCurrent();
-      if (calibPoint) {
-        const estimatedFaces = await model.estimateFaces(video, false, true);
-        const meshes = estimatedFaces.map(p => p.scaledMesh);
-        if (meshes.length > 0) {
-          this.datasetController.addTrainingSample(meshes, [calibPoint[0] / this.gazeCanvas.width, calibPoint[1] / this.gazeCanvas.height]);
-        }
-      }
-      stats.end();
-      requestAnimationFrame(render);
+    render(renderItem: number) {
+        this.stop()
+        let x: number = this.calibPoints[renderItem][0]* this.renderElement.width;
+        let y: number = this.calibPoints[renderItem][1]*this.renderElement.height;
+        this.drawCircle(x, y);
     }
-    render();
-  }
 
-  public stopRender() {
-    this.running = false;
-  }
+    private drawCircle(x: number, y: number){
+        this.context.beginPath();
+        this.context.arc(x, y, this.circleRadius, 0, 2 * Math.PI);
+        this.context.fill();
+        this.context.stroke();
+    }
+
+    stop() {
+        this.context.clearRect(0, 0, this.renderElement.width, this.renderElement.height);
+    }
+
+
 }
