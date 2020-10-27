@@ -2,6 +2,7 @@ import {FaceRepresentationPipeline} from "../pipelines/face-representation-pipel
 import * as tf from "@tensorflow/tfjs"
 import {CalibrationRenderer} from "../renderers/calibration-renderer";
 import {RepresentationGazeDatasetGenerator} from "../pipelines/representation-gaze-dataset-generator";
+import swal from "sweetalert";
 
 export class CalibrationController{
 
@@ -44,6 +45,16 @@ export class CalibrationController{
         this.running = true;
         // tf.engine().startScope()
 
+        await swal({
+            title: "Dare to take the challenge??",
+            text: "Avoid obstacles to get points. Let's start by calibrating. Select any 2 poses/ actions for controlling",
+        });
+
+        await swal({
+            title: "Lets start!!!",
+            text: "Select any 2 gaze-points/ poses/ actions for controlling. Stay in your pose 1 until the next pop-up. You can use dots on screen as gaze points.",
+        });
+
         const render = async () => {
             if (!this.running) return;
             this.stats.begin();
@@ -68,6 +79,10 @@ export class CalibrationController{
 
             if(this.currentInstanceCount < this.numberPoints*this.instanceCountPerItem){
                 if(this.currentInstanceCount% this.instanceCountPerItem == 0){
+                    await swal({
+                        title: "One more !!",
+                        text: "Stay in pose 2 untill next pop-up",
+                    });
                     this.currentPoint ++;
                 }
                 requestAnimationFrame(render);

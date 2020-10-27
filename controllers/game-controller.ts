@@ -126,5 +126,9 @@ export class GameController{
 
     }
 
+    getState(): GameControllerState{
+        return this.gameControllerState;
+    }
+
 
 }

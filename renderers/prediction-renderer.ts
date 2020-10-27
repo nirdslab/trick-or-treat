@@ -28,15 +28,35 @@ export class PredictionRenderer extends Renderer<number, HTMLCanvasElement>{
     render(renderItem: number) {
         let x: number = this.predPoints[renderItem][0]* this.renderElement.width;
         let y: number = this.predPoints[renderItem][1]*this.renderElement.height;
-        this.drawCircle(x, y);
+        if(renderItem == 0){
+            this.drawTriangle(x, y, true);
+        }
+        else{
+            this.drawTriangle(x, y);
+        }
     }
 
-    private drawCircle(x: number, y: number){
+    private drawTriangle(x: number, y: number, upright: boolean = false){
+        this.context.fillStyle = "lime";
         this.context.beginPath();
-        this.context.arc(x, y, this.circleRadius, 0, 2 * Math.PI);
+        this.context.lineTo(x-0.05 * this.renderElement.width, y);
+        this.context.lineTo(x+ 0.05 * this.renderElement.width, y);
+        if(upright){
+            this.context.lineTo(x, y - 0.05 * this.renderElement.height);
+        }
+        else{
+            this.context.lineTo(x, y + 0.05 * this.renderElement.height);
+        }
+
         this.context.fill();
-        this.context.stroke();
     }
+
+    // private drawCircle(x: number, y: number){
+    //     this.context.beginPath();
+    //     this.context.arc(x, y, this.circleRadius, 0, 2 * Math.PI);
+    //     this.context.fill();
+    //     this.context.stroke();
+    // }
 
     stop() {
         this.context.clearRect(0, 0, this.renderElement.width, this.renderElement.height);

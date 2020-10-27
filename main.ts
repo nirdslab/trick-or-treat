@@ -13,6 +13,7 @@ import {RepresentationGazeDatasetGenerator} from "./pipelines/representation-gaz
 import {PredictionRenderer} from "./renderers/prediction-renderer";
 import {GameController} from "./controllers/game-controller";
 import {GameRenderer} from "./renderers/game-renderer";
+import swal from "sweetalert";
 
 const screenPos: Array<[number, number]> = [
     [0.5, 0.1],
@@ -79,9 +80,12 @@ export class Main {
                 console.log(data[0].shape);
                 const history = await this.representationGazePipeline1.train(data[0], data[1])
                 console.log(history);
-                console.log("Training");
-                await this.start("predict");
                 await this.representationGazePipeline1.save();
+                await swal({
+                    title: "calibration Success!!",
+                    icon: "success"
+                });
+                await this.start("predict");
                 r.freeData();
                 tf.engine().endScope();
             });

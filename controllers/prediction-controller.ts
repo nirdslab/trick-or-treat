@@ -3,6 +3,7 @@ import {FaceRepresentation, FaceRepresentationPipeline} from "../pipelines/face-
 import {RepresentationGazePipeline} from "../pipelines/representation-gaze-pipeline";
 import {PredictionRenderer} from "../renderers/prediction-renderer";
 import {GameController} from "./game-controller";
+import swal from "sweetalert";
 
 export class PredictionController {
 
@@ -57,6 +58,12 @@ export class PredictionController {
            this.gameController.updateAcceleration(classVal);
           }
           else{
+            const score: number = this.gameController.getState().obstacleCount;
+            await swal({
+              title: "Game Finished!!",
+              text: "Your score : " + score,
+            });
+            location.reload();
             return;
           }
         }

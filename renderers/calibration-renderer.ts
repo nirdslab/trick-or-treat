@@ -20,7 +20,6 @@ export class CalibrationRenderer extends Renderer<number, HTMLCanvasElement>{
     constructor(htmlCanvasElement: HTMLCanvasElement, calibPoints: Array<[number, number]> = defaultCalibPoints) {
         super(htmlCanvasElement);
         this.context = this.renderElement.getContext('2d');
-        this.circleRadius = 10;
         this.calibPoints = calibPoints;
     }
 
@@ -33,7 +32,7 @@ export class CalibrationRenderer extends Renderer<number, HTMLCanvasElement>{
 
     private drawCircle(x: number, y: number){
         this.context.beginPath();
-        this.context.arc(x, y, this.circleRadius, 0, 2 * Math.PI);
+        this.context.arc(x, y, 0.05 * this.renderElement.height, 0, 2 * Math.PI);
         this.context.fill();
         this.context.stroke();
     }
