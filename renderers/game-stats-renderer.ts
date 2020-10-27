@@ -1,7 +1,7 @@
 import {Renderer} from "./renderer";
 import {GameControllerState} from "../controllers/game-controller";
 
-export class StatsRenderer extends Renderer<GameControllerState, HTMLCanvasElement>{
+export class GameStatsRenderer extends Renderer<GameControllerState, HTMLCanvasElement>{
 
     private context: CanvasRenderingContext2D;
 
@@ -13,7 +13,8 @@ export class StatsRenderer extends Renderer<GameControllerState, HTMLCanvasEleme
 
     render(renderItem: GameControllerState) {
         this.context.font = "30px Arial";
-        this.context.fillText("Score: " + renderItem.obstacleCount, 0.2 * this.renderElement.width, 0.8* this.renderElement.height);
+        this.context.fillText("Score: " + renderItem.obstacleCount, 0.1 * this.renderElement.width, 0.8* this.renderElement.height);
+        this.context.fillText("Tweet your score @nirdslab",0.1 * this.renderElement.width, 0.7 * this.renderElement.height);
     }
 
     stop() {

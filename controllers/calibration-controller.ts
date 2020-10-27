@@ -52,7 +52,14 @@ export class CalibrationController{
 
         await swal({
             title: "Lets start!!!",
-            text: "Select any 2 gaze-points/ poses/ actions for controlling. Stay in your pose 1 until the next pop-up. You can use dots on screen as gaze points.",
+            text: "Select any 2 gaze-points/ poses/ actions for controlling the game." +
+                "Use pose 1 to move up and pose 2 to move down.tay in your pose 1 until the next pop-up. You can use dots on screen as gaze points.",
+        });
+
+        await swal({
+            title: "Step 1",
+            text: "Select any 2 gaze-points/ poses/ actions for controlling the game." +
+                "Use pose 1 to move up and pose 2 to move down.tay in your pose 1 until the next pop-up. You can use dots on screen as gaze points.",
         });
 
         const render = async () => {

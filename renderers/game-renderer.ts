@@ -2,7 +2,7 @@ import {Renderer} from "./renderer";
 import {GameComponent, GameControllerState} from "../controllers/game-controller";
 import {GameComponentRenderer} from "./game-component-renderer";
 import {PredictionRenderer} from "./prediction-renderer";
-import {StatsRenderer} from "./stats-renderer";
+import {GameStatsRenderer} from "./game-stats-renderer";
 
 export class GameRenderer extends Renderer<GameControllerState, HTMLCanvasElement>{
 
@@ -12,7 +12,7 @@ export class GameRenderer extends Renderer<GameControllerState, HTMLCanvasElemen
 
     private predictionRenderer: PredictionRenderer;
 
-    private statsRenderer: StatsRenderer;
+    private statsRenderer: GameStatsRenderer;
 
     private backgroundImage: HTMLImageElement;
 
@@ -26,7 +26,7 @@ export class GameRenderer extends Renderer<GameControllerState, HTMLCanvasElemen
             [0.5, 0.1],
             [0.5, 0.9],
         ]);
-        this.statsRenderer = new StatsRenderer(gameCanvas);
+        this.statsRenderer = new GameStatsRenderer(gameCanvas);
         this.backgroundImage = new window.Image();
         this.backgroundImage.src = "https://www.cs.odu.edu/~bhanuka/background.png";
     }

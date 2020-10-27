@@ -60,8 +60,8 @@ export class PredictionController {
           else{
             const score: number = this.gameController.getState().obstacleCount;
             await swal({
-              title: "Game Finished!!",
-              text: "Your score : " + score,
+              title: "Your Score : " + score,
+              text: "Tweet your score @nirdslab #trick-or-research",
             });
             location.reload();
             return;

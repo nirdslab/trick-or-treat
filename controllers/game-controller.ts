@@ -93,7 +93,9 @@ export class GameController{
         if(this.crashWithOther()){
             this.isClear = false;
         }
-        this.isClear = this.gameControllerState.mainComponent.y > 0.1 && this.gameControllerState.mainComponent.y < 0.9;
+        else{
+            this.isClear = this.gameControllerState.mainComponent.y > 0.1 && this.gameControllerState.mainComponent.y < 0.9;
+        }
     }
 
     public checkClear(): boolean{
