@@ -1,5 +1,14 @@
 import {Renderer} from "./renderer";
 
+
+const defaultCalibPoints: Array<[number, number]> = [
+    [0.1, 0.1],
+    [0.9, 0.1],
+    [0.5, 0.5],
+    [0.1, 0.9],
+    [0.9, 0.9],
+];
+
 export class CalibrationRenderer extends Renderer<number, HTMLCanvasElement>{
 
     private context: CanvasRenderingContext2D;
@@ -8,17 +17,11 @@ export class CalibrationRenderer extends Renderer<number, HTMLCanvasElement>{
 
     private circleRadius: number;
 
-    constructor(htmlCanvasElement: HTMLCanvasElement) {
+    constructor(htmlCanvasElement: HTMLCanvasElement, calibPoints: Array<[number, number]> = defaultCalibPoints) {
         super(htmlCanvasElement);
         this.context = this.renderElement.getContext('2d');
         this.circleRadius = 10;
-        this.calibPoints = [
-            [0.1, 0.1],
-            [0.9, 0.1],
-            [0.5, 0.5],
-            [0.1, 0.9],
-            [0.9, 0.9],
-        ]
+        this.calibPoints = calibPoints;
     }
 
     render(renderItem: number) {
@@ -37,6 +40,10 @@ export class CalibrationRenderer extends Renderer<number, HTMLCanvasElement>{
 
     stop() {
         this.context.clearRect(0, 0, this.renderElement.width, this.renderElement.height);
+    }
+
+    getCalibPoints(): Array<[number, number]>{
+        return this.calibPoints;
     }
 
 

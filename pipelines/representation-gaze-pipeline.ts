@@ -16,7 +16,7 @@ export class RepresentationGazePipeline extends Pipeline<FaceRepresentation, num
 
     private model: tf.Sequential;
 
-    private numClasses: number = 5;
+    private numClasses: number = 2;
 
     private learningRate = 0.001;
 

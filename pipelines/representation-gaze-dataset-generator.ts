@@ -10,7 +10,7 @@ export class RepresentationGazeDatasetGenerator{
 
     async addExample(input: tf.Tensor, label: tf.Tensor): Promise<any> {
         const y = tf.tidy(() => {
-            return tf.oneHot(label.toInt(), 5)
+            return tf.oneHot(label.toInt(), 2)
         });
         if(this.inputs == null){
             this.inputs = tf.keep(input);
@@ -34,7 +34,7 @@ export class RepresentationGazeDatasetGenerator{
 
     getData(): [tf.Tensor, tf.Tensor]{
         // localStorage.setItem("input", JSON.stringify(this.inputs.dataSync()));
-        localStorage.setItem("labels", JSON.stringify(this.labels.dataSync()));
+        // localStorage.setItem("labels", JSON.stringify(this.labels.dataSync()));
         return [this.inputs, this.labels];
     }
 

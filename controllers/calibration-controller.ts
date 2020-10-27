@@ -25,13 +25,13 @@ export class CalibrationController{
 
     private numberPoints: number;
 
-    constructor(videoElement: HTMLVideoElement, stats: Stats, calibrationRenderer: CalibrationRenderer, instanceCountPerItem: number = 50, numberPoints: number=5) {
+    constructor(videoElement: HTMLVideoElement, stats: Stats, calibrationRenderer: CalibrationRenderer, instanceCountPerItem: number = 50) {
         this.videoElement = videoElement;
         this.stats = stats;
         this.calibrationRenderer = calibrationRenderer;
-        this.numberPoints = numberPoints;
         this.instanceCountPerItem = instanceCountPerItem;
         this.representationGazeDatasetGenerator = new RepresentationGazeDatasetGenerator();
+        this.numberPoints = this.calibrationRenderer.getCalibPoints().length;
         this.init();
     }
 
@@ -48,6 +48,9 @@ export class CalibrationController{
             if (!this.running) return;
             this.stats.begin();
 
+            tf.tidy(() => {
+                tf.browser.toPixels(tf.browser.fromPixels(this.videoElement), document.getElementById("face-output"));
+            });
 
             const faceRepresentation = await this.faceRepresentationPipeline.process(this.videoElement);
             this.calibrationRenderer.render(this.currentPoint);

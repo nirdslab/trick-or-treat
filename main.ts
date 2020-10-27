@@ -11,6 +11,13 @@ import {CalibrationRenderer} from "./renderers/calibration-renderer";
 import {RepresentationGazePipeline} from "./pipelines/representation-gaze-pipeline";
 import {RepresentationGazeDatasetGenerator} from "./pipelines/representation-gaze-dataset-generator";
 import {PredictionRenderer} from "./renderers/prediction-renderer";
+import {GameController} from "./controllers/game-controller";
+import {GameRenderer} from "./renderers/game-renderer";
+
+const screenPos: Array<[number, number]> = [
+    [0.5, 0.1],
+    [0.5, 0.9],
+];
 
 export class Main {
     // HTML Elements
@@ -21,14 +28,15 @@ export class Main {
     // Renderers
     private predictionController: PredictionController;
     private calibrationController: CalibrationController;
+    private gameController: GameController;
     // Controllers
     private stats = new Stats();
     private gui = new GUI();
     // Application State
-    private state = { maxFaces: 1, mode: 'predict' };
+    private state = { maxFaces: 1, mode: 'train' };
     // Models
     private faceRepresentationPipeline: FaceRepresentationPipeline;
-    private reperesentationGazePipeline: RepresentationGazePipeline;
+    private representationGazePipeline1: RepresentationGazePipeline;
     private videoWidth = 224;
     private videoHeight = 224;
 
@@ -40,20 +48,26 @@ export class Main {
         this.faceCanvas = <HTMLCanvasElement>document.getElementById('face-output');
         // Gaze Components
         this.gazeCanvas = <HTMLCanvasElement>document.getElementById("gaze-output");
+
+        this.gazeCanvas.width = document.body.clientWidth;
+        this.gazeCanvas.height = document.body.clientHeight;
         // Controllers
-        this.predictionController = new PredictionController(this.video, this.stats, new PredictionRenderer(this.gazeCanvas));
-        this.calibrationController = new CalibrationController(this.video, this.stats, new CalibrationRenderer(this.gazeCanvas));
+        this.predictionController = new PredictionController(this.video, this.stats, new PredictionRenderer(this.gazeCanvas, screenPos));
+        this.calibrationController = new CalibrationController(this.video, this.stats, new CalibrationRenderer(this.gazeCanvas, screenPos));
+        console.log(this.gazeCanvas.height);
+        console.log(this.gazeCanvas.width);
+        this.gameController = new GameController(new GameRenderer(this.gazeCanvas));
     }
 
     private async start(mode: string) {
         if (mode == 'predict') {
             console.log("predicting");
-            // await this.reperesentationGazePipeline.load();
+            // await this.representationGazePipeline1.load();
             // Update attributes
             this.faceCanvas.hidden = false;
             // Logic
             await this.calibrationController.stop();
-            await this.predictionController.start();
+            await this.predictionController.start(this.gameController);
         }
         else {
             // Logic
@@ -62,11 +76,12 @@ export class Main {
             this.predictionController.stop();
             await this.calibrationController.start(async (r: RepresentationGazeDatasetGenerator) => {
                 const data: [tf.Tensor, tf.Tensor] = r.getData();
-                const history = await this.reperesentationGazePipeline.train(data[0], data[1])
+                console.log(data[0].shape);
+                const history = await this.representationGazePipeline1.train(data[0], data[1])
                 console.log(history);
                 console.log("Training");
                 await this.start("predict");
-                await this.reperesentationGazePipeline.save();
+                await this.representationGazePipeline1.save();
                 r.freeData();
                 tf.engine().endScope();
             });
@@ -132,9 +147,9 @@ export class Main {
         await this.setupStatsGUI();
         await this.setupCamera();
         this.faceRepresentationPipeline = await faceRepresentationPipeline.load({ maxFaces: this.state.maxFaces});
-        this.reperesentationGazePipeline = await representationGazePipeline.load();
+        this.representationGazePipeline1 = await representationGazePipeline.load();
         this.predictionController.setFaceRepresentationPipeline(this.faceRepresentationPipeline);
-        this.predictionController.setRepresentationGazePipeline(this.reperesentationGazePipeline);
+        this.predictionController.setRepresentationGazePipeline(this.representationGazePipeline1);
         this.calibrationController.setFaceRepresentationPipeline(this.faceRepresentationPipeline);
         this.start(this.state.mode);
     }

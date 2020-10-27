@@ -26,8 +26,6 @@ export class PredictionRenderer extends Renderer<number, HTMLCanvasElement>{
     }
 
     render(renderItem: number) {
-        console.log(renderItem);
-        this.stop()
         let x: number = this.predPoints[renderItem][0]* this.renderElement.width;
         let y: number = this.predPoints[renderItem][1]*this.renderElement.height;
         this.drawCircle(x, y);
